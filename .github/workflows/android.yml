@@ -1,23 +1,34 @@
-name: Construire ConteMerveilles pour Android
+name: Construire ConteMerveilles APK Android
 
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'style.css'
+      - 'app.js'
+      - 'manifest.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.json'
+      - 'images/**'
+      - 'audio/**'
+      - 'audios/**'
+      - 'sounds/**'
+      - '.github/workflows/android.yml'
 
 permissions:
   contents: read
 
-concurrency:
-  group: contemerveilles-android-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build-android:
+    name: Construire l'APK Android
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+
     steps:
-      - name: Récupérer le dépôt
+      - name: Télécharger le dépôt
         uses: actions/checkout@v4
 
       - name: Installer Node.js
@@ -25,96 +36,104 @@ jobs:
         with:
           node-version: 22
 
-      - name: Installer Java 21
+      - name: Installer Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+          cache: gradle
 
       - name: Installer Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
-      - name: Vérifier et préparer les fichiers
-        shell: bash
+      - name: Vérifier les fichiers nécessaires
         run: |
-          set -Eeuo pipefail
-          test -f index.html || { echo 'ERREUR: index.html doit être à la racine du dépôt.'; exit 1; }
-          test -f images/icon.png || { echo 'ERREUR: images/icon.png introuvable. Vérifie le chemin et les majuscules/minuscules.'; exit 1; }
-          if [ -f images/splash.png ]; then
-            SPLASH_SOURCE="images/splash.png"
-          elif [ -f images/splash-screen.png ]; then
-            SPLASH_SOURCE="images/splash-screen.png"
-          else
-            echo 'ERREUR: image de démarrage introuvable. Le workflow accepte images/splash.png ou images/splash-screen.png.'
+          test -f index.html || { echo 'ERREUR : index.html est introuvable à la racine du dépôt.'; exit 1; }
+          test -f images/icon.png || { echo 'ERREUR : images/icon.png est introuvable.'; exit 1; }
+          if [ ! -f images/splash.png ] && [ ! -f images/splash-screen.png ]; then
+            echo 'ERREUR : place images/splash.png ou images/splash-screen.png dans le dossier images.'
             exit 1
           fi
-          echo "Image de démarrage utilisée: ${SPLASH_SOURCE}"
-          export SPLASH_SOURCE
-          mkdir -p www/images assets
-          cp index.html www/index.html
-          cp -R images/. www/images/
-          npm init -y
-          npm install --save-exact @capacitor/core@7 @capacitor/android@7 @capacitor/splash-screen@7
-          npm install --save-dev --save-exact @capacitor/cli@7 @capacitor/assets@3 sharp
-          node --input-type=module <<'NODE'
-          import sharp from 'sharp';
-          import fs from 'node:fs';
-          const icon = 'images/icon.png';
-          const splash = process.env.SPLASH_SOURCE || (fs.existsSync('images/splash.png') ? 'images/splash.png' : 'images/splash-screen.png');
-          // Capacitor Assets attend des sources assez grandes. Agrandit au besoin sans étirer l'image.
-          await sharp(icon).resize(1024, 1024, { fit: 'contain', background: '#ffffff' }).png().toFile('assets/icon-only.png');
-          await sharp(icon).resize(1024, 1024, { fit: 'contain', background: '#ffffff' }).png().toFile('assets/icon-foreground.png');
-          await sharp(icon).resize(1024, 1024, { fit: 'cover', position: 'centre' }).png().toFile('assets/icon-background.png');
-          await sharp(splash).resize(2732, 2732, { fit: 'contain', background: '#ffffff' }).png().toFile('assets/splash.png');
-          console.log(`Images préparées: ${icon} et ${splash}`);
-          NODE
-          cat > capacitor.config.json <<'JSON'
+          echo 'Fichiers HTML et images trouvés.'
+
+      - name: Préparer le projet Node et Capacitor
+        run: |
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+          npm install @capacitor/core @capacitor/android @capacitor/cli @capacitor/assets
+          if [ ! -f capacitor.config.json ]; then
+            cat > capacitor.config.json <<'JSON'
           {
             "appId": "com.israelzongwe.contemerveilles",
             "appName": "ConteMerveilles",
             "webDir": "www",
-            "plugins": {
-              "SplashScreen": {
-                "launchShowDuration": 2000,
-                "launchAutoHide": true,
-                "backgroundColor": "#ffffff",
-                "androidSplashResourceName": "splash",
-                "androidScaleType": "CENTER_INSIDE",
-                "showSpinner": false
-              }
-            }
+            "bundledWebRuntime": false
           }
           JSON
+          fi
 
-      - name: Vérifier les images préparées
-        shell: bash
+      - name: Préparer les fichiers web
         run: |
-          set -Eeuo pipefail
-          test -s assets/icon-only.png
-          test -s assets/icon-foreground.png
-          test -s assets/icon-background.png
-          test -s assets/splash.png
-          file assets/*.png
+          mkdir -p www
+          cp index.html www/
+          for file in style.css app.js manifest.json; do
+            if [ -f "$file" ]; then cp "$file" www/; fi
+          done
+          for folder in images audio audios sounds; do
+            if [ -d "$folder" ]; then cp -R "$folder" www/; fi
+          done
 
-      - name: Ajouter la plateforme Android
-        run: npx cap add android
+      - name: Préparer les ressources de l'icône et du démarrage
+        run: |
+          python3 -m pip install --user Pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps
 
-      - name: Générer les ressources Android (icône et splash)
+          Path("assets").mkdir(exist_ok=True)
+
+          def contain_on_canvas(source, size, background):
+              image = Image.open(source).convert("RGBA")
+              image = ImageOps.contain(image, (size, size), method=Image.Resampling.LANCZOS)
+              canvas = Image.new("RGBA", (size, size), background)
+              x = (size - image.width) // 2
+              y = (size - image.height) // 2
+              canvas.alpha_composite(image, (x, y))
+              return canvas
+
+          icon = contain_on_canvas("images/icon.png", 1024, (0, 0, 0, 0))
+          icon.save("assets/icon-only.png")
+          icon.save("assets/icon-foreground.png")
+          Image.new("RGB", (1024, 1024), (7, 20, 38)).save("assets/icon-background.png")
+
+          splash_source = "images/splash.png" if Path("images/splash.png").is_file() else "images/splash-screen.png"
+          splash = contain_on_canvas(splash_source, 2732, (7, 20, 38, 255))
+          splash.convert("RGB").save("assets/splash.png")
+          print(f"Icône préparée depuis images/icon.png ; splash préparé depuis {splash_source}.")
+          PY
+
+      - name: Ajouter la plateforme Android si nécessaire
+        run: |
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
+
+      - name: Générer les icônes et l'écran de démarrage Android
         run: npx capacitor-assets generate --android
 
       - name: Synchroniser Capacitor
         run: npx cap sync android
 
-      - name: Construire l’APK de test
-        working-directory: android
-        shell: bash
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Construire l'APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
 
-      - name: Vérifier que l’APK existe
-        shell: bash
-        run: test -s android/app/build/outputs/apk/debug/app-debug.apk
-
-      - name: Publier l’APK à télécharger
+      - name: Publier l'APK
         uses: actions/upload-artifact@v4
         with:
           name: ConteMerveilles-Android-APK
