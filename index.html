@@ -1733,9 +1733,9 @@ function ouvrirConte(cat, index){
   indexActuel = index;
   const conte = MODELES[cat][index];
 
-  document.getElementById("story-title").textContent = conte.titre;
+  document.getElementById("story-title").textContent = personnaliser(conte.titre);
   document.getElementById("story-illustration").innerHTML = SVG[cat]||SVG.aventure;
-  document.getElementById("story-body").innerHTML = personnaliser(conte.texte) + `<p class="extra-paragraph">${({
+  document.getElementById("story-body").innerHTML = personnaliser(conte.texte) + `<p class="extra-paragraph">${personnaliser(({
 aventure:"Avant de rentrer, {nom} prit le temps de regarder le chemin parcouru. Chaque rencontre lui avait appris à écouter avant de juger, à rester courageux devant l'inconnu et à tenir ses promesses. De retour au village, il raconta son aventure et partagea ce qu'il avait appris. Les habitants gardèrent longtemps cette histoire en mémoire.",
 foret:"Les jours suivants, {nom} revint dans la forêt pour observer les animaux et prendre soin des plantes. Il apprit à reconnaître les chants des oiseaux et à respecter même les plus petites créatures. Peu à peu, les habitants comprirent qu'ils devaient protéger ensemble ce lieu précieux.",
 ville:"Après cette aventure, {nom} raconta ce qui s'était passé aux voisins. Plusieurs personnes décidèrent de participer et, ensemble, elles améliorèrent leur quartier. Les passants s'arrêtaient désormais pour se parler et s'entraider. {nom} comprit qu'un petit geste peut inspirer toute une communauté.",
@@ -1744,7 +1744,7 @@ marin:"Lorsque la mer retrouva son calme, {nom} observa l'horizon et remercia se
 drole:"Quand l'histoire fut racontée au reste du village, chacun ajouta un détail encore plus drôle. Les rires se prolongèrent jusqu'au soir et les petites querelles furent oubliées. {nom} découvrit qu'un peu d'humour accompagné de gentillesse peut rapprocher les gens.",
 sorcier:"Avant de partir, {nom} nota soigneusement ce qu'il avait appris dans son carnet. Il comprit que la magie demande de la patience, de la responsabilité et de la bienveillance. Il promit d'utiliser ses connaissances pour aider les autres et non pour leur nuire.",
 famille:"Plus tard, la famille se retrouva pour partager un repas et reparler de cette journée. Chacun expliqua ce qu'il avait ressenti et ce qu'il souhaitait améliorer. Ils décidèrent de s'écouter davantage et de s'entraider, même lorsque les journées seraient difficiles."
-})[cat]||" {nom} garda cette aventure en mémoire et en partagea la leçon avec ceux qu'il aimait."}</p>`.replace(/\\{nom\\}/g,utilisateur.nom);
+})[cat]||" {nom} garda cette aventure en mémoire et en partagea la leçon avec ceux qu'il aimait.")}</p>`;
   document.getElementById("quiz-container").innerHTML = "";
 
   const btnQuiz = document.getElementById("btn-quiz");
@@ -1832,7 +1832,7 @@ function afficherQuestionQuiz(){
   if(!prog[key]||prog[key]<score){prog[key]=score;ecrireStockage("cm-scores",JSON.stringify(prog))}mettreAJourProgression();quizEnCours=false;return;
  }
  const q=quiz[quizQuestionActuelle];
- stage.innerHTML=`<p class="quiz-progress">Question ${quizQuestionActuelle+1} sur ${quiz.length}</p><div class="quiz-box"><div class="quiz-question"><p>${personnaliser(q.q)}</p>${q.options.map((opt,j)=>`<button class="quiz-option" onclick="repondreQuestionQuiz(${j})">${opt}</button>`).join("")}</div><div id="quiz-feedback" class="quiz-result"></div><button id="quiz-next" class="quiz-next" style="display:none" onclick="questionQuizSuivante()">Question suivante →</button></div>`;
+ stage.innerHTML=`<p class="quiz-progress">Question ${quizQuestionActuelle+1} sur ${quiz.length}</p><div class="quiz-box"><div class="quiz-question"><p>${personnaliser(q.q)}</p>${q.options.map((opt,j)=>`<button class="quiz-option" onclick="repondreQuestionQuiz(${j})">${personnaliser(opt)}</button>`).join("")}</div><div id="quiz-feedback" class="quiz-result"></div><button id="quiz-next" class="quiz-next" style="display:none" onclick="questionQuizSuivante()">Question suivante →</button></div>`;
  quizARepondu=false;
 }
 function repondreQuestionQuiz(optIndex){
