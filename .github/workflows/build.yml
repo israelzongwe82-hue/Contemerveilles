@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Télécharger le dépôt
+      - name: Télécharger les fichiers
         uses: actions/checkout@v4
 
       - name: Installer Java
@@ -29,14 +29,29 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Préparer l'application Android
+      - name: Installer Cordova
+        run: npm install --global cordova
+
+      - name: Créer le projet Android
         run: |
-          npm install --global cordova
           cordova create app com.contemerveilles.app ConteMerveilles
           cd app
           cordova platform add android
+
           cp ../index.html www/index.html
           cp -r ../images www/images
+
+          mkdir -p resources
+          cp ../images/icon.png resources/icon.png
+          cp ../images/splash.png resources/splash.png
+
+          npm install cordova-res --save-dev
+
+          npx cordova-res android \
+            --icon-source resources/icon.png \
+            --splash-source resources/splash.png \
+            --copy
+
           cordova build android
 
       - name: Publier l'APK
@@ -46,11 +61,11 @@ jobs:
           path: app/platforms/android/app/build/outputs/apk/debug/*.apk
 
   windows:
-    name: Build Windows
+    name: Build Windows EXE
     runs-on: windows-latest
 
     steps:
-      - name: Télécharger le dépôt
+      - name: Télécharger les fichiers
         uses: actions/checkout@v4
 
       - name: Installer Node.js
@@ -58,7 +73,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Préparer l'application Windows
+      - name: Créer l'application Windows
         shell: pwsh
         run: |
           npm init -y
