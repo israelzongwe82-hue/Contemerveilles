@@ -1,0 +1,121 @@
+name: Build ConteMerveilles
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Télécharger le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Préparer l'application Android
+        run: |
+          npm install --global cordova
+          cordova create app com.contemerveilles.app ConteMerveilles
+          cd app
+          cordova platform add android
+          cp ../index.html www/index.html
+          cp -r ../images www/images
+          cordova build android
+
+      - name: Publier l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConteMerveilles-Android
+          path: app/platforms/android/app/build/outputs/apk/debug/*.apk
+
+  windows:
+    name: Build Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Télécharger le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Préparer l'application Windows
+        shell: pwsh
+        run: |
+          npm init -y
+          npm install electron electron-builder --save-dev
+
+          @'
+          const { app, BrowserWindow } = require('electron');
+          const path = require('path');
+
+          function createWindow() {
+            const win = new BrowserWindow({
+              width: 1000,
+              height: 750,
+              autoHideMenuBar: true,
+              icon: path.join(__dirname, 'images', 'icon.png'),
+              webPreferences: {
+                contextIsolation: true,
+                nodeIntegration: false
+              }
+            });
+
+            win.loadFile('index.html');
+          }
+
+          app.whenReady().then(createWindow);
+
+          app.on('window-all-closed', () => {
+            if (process.platform !== 'darwin') app.quit();
+          });
+          '@ | Set-Content main.js
+
+          npm pkg set name="contemerveilles"
+          npm pkg set productName="ConteMerveilles"
+          npm pkg set version="1.0.0"
+          npm pkg set main="main.js"
+          npm pkg set "scripts.dist=electron-builder --win nsis"
+
+          @'
+          {
+            "appId": "com.contemerveilles.app",
+            "productName": "ConteMerveilles",
+            "files": [
+              "main.js",
+              "index.html",
+              "images/**/*"
+            ],
+            "win": {
+              "target": "nsis",
+              "icon": "images/icon.png"
+            }
+          }
+          '@ | Set-Content electron-builder.json
+
+          npm run dist
+
+      - name: Publier l'application Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConteMerveilles-Windows
+          path: dist/*.exe
