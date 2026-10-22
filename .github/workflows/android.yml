@@ -1,0 +1,92 @@
+name: Construire ConteMerveilles Android
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "index.html"
+      - "images/**"
+      - ".github/workflows/android.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    name: Générer l'APK Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Télécharger le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Installer le SDK Android
+        uses: android-actions/setup-android@v3
+
+      - name: Installer les composants Android nécessaires
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Vérifier les fichiers de l'application
+        run: |
+          test -f index.html
+          test -f images/icon.png
+          test -f images/splash.png
+
+      - name: Préparer le projet Cordova
+        run: |
+          mkdir -p /tmp/contemerveilles
+          cd /tmp/contemerveilles
+          npm init -y
+          npm install --save-dev cordova@12
+          npx cordova create app com.contemerveilles.app "ConteMerveilles"
+          cd app
+          rm -rf www/*
+          cp "$GITHUB_WORKSPACE/index.html" www/index.html
+          cp -R "$GITHUB_WORKSPACE/images" www/images
+          mkdir -p resources
+          cp "$GITHUB_WORKSPACE/images/icon.png" resources/icon.png
+          cp "$GITHUB_WORKSPACE/images/splash.png" resources/splash.png
+          cat > config.xml <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <widget id="com.contemerveilles.app" version="1.0.1"
+              xmlns="http://www.w3.org/ns/widgets"
+              xmlns:cdv="http://cordova.apache.org/ns/1.0">
+              <name>ConteMerveilles</name>
+              <description>Une bibliothèque de contes à lire hors ligne.</description>
+              <content src="index.html" />
+              <access origin="*" />
+              <allow-intent href="http://*/*" />
+              <allow-intent href="https://*/*" />
+              <allow-intent href="tel:*" />
+              <allow-intent href="mailto:*" />
+              <preference name="AndroidXEnabled" value="true" />
+              <preference name="DisallowOverscroll" value="true" />
+              <icon src="resources/icon.png" />
+          </widget>
+          EOF
+          npx cordova platform add android@14.0.1
+
+      - name: Compiler l'APK Android
+        working-directory: /tmp/contemerveilles/app
+        run: npx cordova build android --debug
+
+      - name: Publier l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConteMerveilles-Android-APK
+          path: /tmp/contemerveilles/app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
