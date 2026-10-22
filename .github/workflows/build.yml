@@ -1,4 +1,4 @@
-name: Build ConteMerveilles
+name: Construire ConteMerveilles
 
 on:
   workflow_dispatch:
@@ -6,131 +6,136 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-
 jobs:
   android:
-    name: Build Android APK
+    name: Application Android APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Télécharger les fichiers
+      - name: Récupérer le projet
         uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Installer Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: 21
 
-      - name: Installer Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+      - name: Installer les outils Android
+        uses: android-actions/setup-android@v3
 
       - name: Installer Cordova
-        run: npm install --global cordova
+        run: npm install -g cordova
 
-      - name: Créer le projet Android
+      - name: Préparer le projet Android
         run: |
+          mkdir -p www
+          cp index.html www/index.html
+          mkdir -p www/images
+          cp -r images/* www/images/
           cordova create app com.contemerveilles.app ConteMerveilles
+          cp -r www/* app/www/
           cd app
           cordova platform add android
+          cordova plugin add cordova-plugin-whitelist || true
+          cordova build android --release
 
-          cp ../index.html www/index.html
-          cp -r ../images www/images
-
-          mkdir -p resources
-          cp ../images/icon.png resources/icon.png
-          cp ../images/splash.png resources/splash.png
-
-          npm install cordova-res --save-dev
-
-          npx cordova-res android \
-            --icon-source resources/icon.png \
-            --splash-source resources/splash.png \
-            --copy
-
-          cordova build android
+      - name: Préparer l'APK
+        run: |
+          mkdir -p sortie
+          cp app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk sortie/ConteMerveilles-Android.apk
 
       - name: Publier l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: ConteMerveilles-Android
-          path: app/platforms/android/app/build/outputs/apk/debug/*.apk
+          name: ConteMerveilles-Android-APK
+          path: sortie/ConteMerveilles-Android.apk
 
   windows:
-    name: Build Windows EXE
+    name: Application Windows EXE
     runs-on: windows-latest
 
     steps:
-      - name: Télécharger les fichiers
+      - name: Récupérer le projet
         uses: actions/checkout@v4
 
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: 22
 
-      - name: Créer l'application Windows
+      - name: Installer les dépendances
+        run: npm install --save-dev electron electron-builder
+
+      - name: Créer les fichiers Windows
         shell: pwsh
         run: |
-          npm init -y
-          npm install electron electron-builder --save-dev
+          @'
+          {
+            "name": "contemerveilles",
+            "version": "1.0.0",
+            "description": "ConteMerveilles",
+            "main": "main.js",
+            "scripts": {
+              "build": "electron-builder --win portable"
+            },
+            "devDependencies": {
+              "electron": "^41.0.0",
+              "electron-builder": "^26.0.0"
+            },
+            "build": {
+              "appId": "com.contemerveilles.app",
+              "productName": "ConteMerveilles",
+              "files": [
+                "main.js",
+                "index.html",
+                "images/**/*"
+              ],
+              "win": {
+                "target": "portable",
+                "icon": "images/icon.png"
+              }
+            }
+          }
+          '@ | Set-Content -Encoding utf8 package.json
 
           @'
-          const { app, BrowserWindow } = require('electron');
-          const path = require('path');
+          const { app, BrowserWindow } = require("electron");
+          const path = require("path");
 
           function createWindow() {
             const win = new BrowserWindow({
-              width: 1000,
-              height: 750,
+              width: 480,
+              height: 850,
               autoHideMenuBar: true,
-              icon: path.join(__dirname, 'images', 'icon.png'),
               webPreferences: {
-                contextIsolation: true,
-                nodeIntegration: false
+                nodeIntegration: false,
+                contextIsolation: true
               }
             });
 
-            win.loadFile('index.html');
+            win.loadFile(path.join(__dirname, "index.html"));
           }
 
           app.whenReady().then(createWindow);
 
-          app.on('window-all-closed', () => {
-            if (process.platform !== 'darwin') app.quit();
+          app.on("window-all-closed", () => {
+            if (process.platform !== "darwin") app.quit();
           });
-          '@ | Set-Content main.js
+          '@ | Set-Content -Encoding utf8 main.js
 
-          npm pkg set name="contemerveilles"
-          npm pkg set productName="ConteMerveilles"
-          npm pkg set version="1.0.0"
-          npm pkg set main="main.js"
-          npm pkg set "scripts.dist=electron-builder --win nsis"
+          npm install
 
-          @'
-          {
-            "appId": "com.contemerveilles.app",
-            "productName": "ConteMerveilles",
-            "files": [
-              "main.js",
-              "index.html",
-              "images/**/*"
-            ],
-            "win": {
-              "target": "nsis",
-              "icon": "images/icon.png"
-            }
-          }
-          '@ | Set-Content electron-builder.json
+      - name: Construire le fichier EXE
+        run: npm run build
 
-          npm run dist
-
-      - name: Publier l'application Windows
+      - name: Publier le fichier EXE
         uses: actions/upload-artifact@v4
         with:
-          name: ConteMerveilles-Windows
+          name: ConteMerveilles-Windows-EXE
           path: dist/*.exe
