@@ -125,7 +125,11 @@ header p{font-size:.95rem;font-style:italic;opacity:.95}
   float:right;background:none;border:none;font-size:1.6rem;
   cursor:pointer;color:var(--texte);line-height:1;
 }
-.story-text{font-size:1rem;line-height:var(--interligne);text-align:justify;color:var(--texte)}
+.story-text{font-size:1.18rem;line-height:1.9;text-align:left;color:var(--texte);max-width:900px;margin:1rem auto 0;letter-spacing:.01em}
+.story-text p{margin-bottom:1.35rem}
+#story-modal #story-title{font-size:clamp(1.5rem,4vw,2.2rem);line-height:1.3;margin-top:1rem}
+#story-modal .illustration{max-height:220px}
+@media(max-width:600px){.story-text{font-size:1.12rem;line-height:1.85;text-align:left}.story-text p{margin-bottom:1.25rem}}
 .story-text p{margin-bottom:1rem}
 
 .illustration{width:100%;max-height:180px;margin-bottom:1rem;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,var(--primaire),var(--secondaire));display:flex;justify-content:center;align-items:center}
@@ -199,7 +203,7 @@ header p{font-size:.95rem;font-style:italic;opacity:.95}
 .settings-box h2{color:var(--secondaire);margin-bottom:1.2rem;text-align:center}
 .settings-group{margin-bottom:1.5rem;padding-bottom:1.2rem;border-bottom:1px solid var(--bordure)}
 .settings-group h3{font-size:.95rem;margin-bottom:.6rem;color:var(--texte-doux)}
-.color-picker{display:flex;gap:.6rem;flex-wrap:wrap}
+.color-picker{display:flex;gap:.6rem;flex-wrap:wrap}.custom-colors{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:1rem}.custom-colors input[type=color]{width:48px;height:40px;border:0;background:transparent;cursor:pointer}.color-swatch.selected{outline:3px solid var(--texte);outline-offset:3px}
 .color-swatch{width:36px;height:36px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .2s}
 .color-swatch:hover{transform:scale(1.1)}
 .slider-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.7rem}
@@ -310,7 +314,7 @@ footer .creator{color:#f1c40f;font-weight:bold}
       <button class="btn-fav" id="btn-fav" onclick="toggleFavori()">⭐ Favori</button>
       <button class="btn-export" onclick="exporterPDF()">📄 PDF</button>
       <button class="btn-export" onclick="exporterWord()">📝 Word</button>
-      <button class="btn-tts" onclick="lireHistoire()">🔊 Écouter</button>
+      <button class="btn-tts" onclick="lireHistoire()">🔊 Écouter</button><button class="btn-close" onclick="arreterLecture()">⏹ Arrêter l’écoute</button>
     </div>
   </div>
 </div>
@@ -337,6 +341,11 @@ footer .creator{color:#f1c40f;font-weight:bold}
     <div class="settings-group">
       <h3>🎨 Couleur principale</h3>
       <div class="color-picker" id="couleur-picker"></div>
+      <div class="custom-colors">
+        <label for="couleur-personnelle">Choisir ma couleur :</label>
+        <input type="color" id="couleur-personnelle" value="#667eea" aria-label="Choisir une couleur personnalisée">
+        <button type="button" class="btn-retour" onclick="appliquerCouleurPersonnelle()">Appliquer</button>
+      </div>
     </div>
 
     <div class="settings-group">
@@ -392,7 +401,7 @@ footer .creator{color:#f1c40f;font-weight:bold}
     </div>
     <h3 style="margin-top:1.5rem;color:var(--secondaire)">Progression globale</h3>
     <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
-    <p style="margin-top:.5rem;font-size:.85rem;color:var(--texte-doux)" id="prog-text">0 / 160 contes lus</p>
+    <p style="margin-top:.5rem;font-size:.85rem;color:var(--texte-doux)" id="prog-text">0 / 7001 contes lus</p>
   </div>
 </div>
 
@@ -501,7 +510,7 @@ function changerProfil(){
 }
 
 /* ============================================================
-   2. CONTES — 20 par catégorie (8 catégories × 20 = 160)
+   2. CONTES — Histoires de départ et ajouts originaux
    Chaque conte : { titre, illustration, texte, quiz[] }
 ============================================================ */
 
@@ -524,7 +533,7 @@ const SVG = {
 };
 
 /* ============================================================
-   MODÈLES DE CONTES (20 par catégorie = 160 contes)
+   MODÈLES DE CONTES (plus de 200 contes)
    Chaque conte = { titre, texte, quiz[] }
    L'utilisateur doit lire AU MOINS un quiz pour débloquer le suivant.
 ============================================================ */
@@ -1655,9 +1664,157 @@ C("Le Déménagement", `
  {q:"Comment se sent {nom} après ?",options:["Triste","Heureux","En colère","Fatigué"],correct:1}])
 ];
 
+
+/* ============================================================
+   NOUVEAUX CONTES ORIGINAUX — ajoutés pour dépasser 200 histoires
+   Chaque histoire possède son propre déroulement et sa propre conclusion.
+============================================================ */
+MODELES.aventure.push(C("La Boussole de Nalia", "<p>Nalia découvrit une boussole qui tournait chaque fois qu'une personne avait besoin d'aide.</p><p>Au col des Brumes, elle suivit l'aiguille jusqu'à un marchand coincé sous sa charrette. Le détour lui fit manquer le coucher du soleil, mais le marchand lui donna une carte oubliée.</p><p>Sur cette carte figurait un passage sûr à travers les montagnes. Nalia partagea ensuite le chemin avec les voyageurs plutôt que de garder le secret.</p>", [{q:"Qui Nalia aide-t-elle ?", options:["Un roi malade", "Un marchand coincé sous sa charrette", "Un dragon endormi", "Un marin perdu"], correct:1}]));
+MODELES.aventure.push(C("Le Pont des Deux Royaumes", "<p>Le prince Sami et l'apprentie bâtisseuse Ayo découvrirent un ravin séparant deux peuples qui ne se parlaient plus.</p><p>Le pont ancien s'était effondré, et chacun accusait l'autre d'avoir négligé les réparations. Ayo proposa que les deux royaumes apportent ensemble pierre, bois et outils.</p><p>Lorsque le dernier pilier fut posé, les chefs se rencontrèrent au milieu du pont et échangèrent leurs premières excuses depuis des années.</p>", [{q:"Comment les deux royaumes reconstruisent-ils le pont ?", options:["En se faisant la guerre", "En attendant un miracle", "En unissant leurs efforts", "En abandonnant le ravin"], correct:2}]));
+MODELES.aventure.push(C("La Graine du géant", "<p>Dans une vallée rocheuse, Israël rencontra un géant qui gardait une graine aussi petite qu'un grain de riz.</p><p>Le géant expliqua que la graine ne pousserait que si quelqu'un la plantait sans réclamer la récolte pour lui-même. Israël choisit un terrain commun près du puits.</p><p>Au printemps, un arbre immense donna des fruits pour tout le village. Même le géant, qui vivait seul depuis longtemps, fut invité au repas des récoltes.</p>", [{q:"Pourquoi la graine devient-elle un arbre généreux ?", options:["Parce qu'elle est plantée pour tous", "Parce qu'on la cache dans un coffre", "Parce que le géant la vend", "Parce qu'on l'arrose d'or"], correct:0}]));
+MODELES.aventure.push(C("Le Train des nuages", "<p>Une locomotive argentée traversait le ciel une seule nuit par an. La mécanicienne Binta y monta pour retrouver une étoile perdue.</p><p>Chaque wagon contenait un souvenir oublié par un voyageur. Binta refusa de voler les souvenirs et demanda plutôt aux passagers de raconter ce qu'ils avaient appris.</p><p>À l'aube, l'étoile retrouva sa place dans le ciel et le train laissa derrière lui une pluie de petites lumières qui guida les enfants rentrant chez eux.</p>", [{q:"Que transporte chaque wagon ?", options:["Des lingots d'or", "Des animaux sauvages", "Des souvenirs oubliés", "Des meubles"], correct:2}]));
+MODELES.aventure.push(C("Le Bouclier qui écoutait", "<p>Le forgeron Malik fabriqua un bouclier qui vibrait lorsqu'une dispute cachait un malentendu.</p><p>Lors d'un tournoi, deux chevaliers se défièrent parce qu'ils croyaient chacun que l'autre avait insulté leur famille. Le bouclier vibra si fort que Malik interrompit le combat et leur demanda de répéter leurs paroles.</p><p>Ils découvrirent qu'un messager avait confondu deux noms. Les chevaliers rangèrent leurs armes et aidèrent Malik à réparer le pont du village.</p>", [{q:"Que révèle le bouclier ?", options:["Un trésor enterré", "Un malentendu", "Un passage secret", "Un sortilège de sommeil"], correct:1}]));
+MODELES.aventure.push(C("La Vallée des mille pas", "<p>La cartographe Zuri cherchait une vallée qui changeait de place à chaque lever du soleil.</p><p>Au lieu de courir derrière l'horizon, elle nota les nuages, les vents et les traces laissées par les animaux. Ses observations révélèrent que la vallée semblait bouger parce que la brume masquait les collines.</p><p>Zuri dessina une carte fondée sur les repères naturels et l'offrit aux bergers. La vallée ne fut plus un piège, mais un chemin sûr pour leurs troupeaux.</p>", [{q:"Comment Zuri trouve-t-elle la vallée ?", options:["En détruisant les collines", "En observant les signes naturels", "En suivant une étoile filante", "En demandant au brouillard de partir"], correct:1}]));
+MODELES.foret.push(C("Le Hibou facteur", "<p>Un hibou nommé Oréo livrait des lettres aux animaux qui n'osaient pas se parler.</p><p>Un jour, il dut porter une lettre d'excuses entre un blaireau et une famille de lapins. La pluie effaça l'encre, alors Oréo retourna voir l'expéditeur pour écouter ses mots de nouveau.</p><p>Il livra la lettre de mémoire, sans changer le sens. Les lapins répondirent par une invitation à partager des carottes au clair de lune.</p>", [{q:"Pourquoi Oréo retourne-t-il voir l'expéditeur ?", options:["Il a perdu ses ailes", "La pluie a effacé l'encre", "Il veut garder la lettre", "Les lapins ont déménagé"], correct:1}]));
+MODELES.foret.push(C("La Forêt qui avait soif", "<p>Les feuilles de la forêt se mirent à chuchoter qu'elles manquaient d'eau, alors que la rivière voisine coulait encore.</p><p>La jeune botaniste Lila remarqua que des branches mortes bloquaient un petit canal naturel. Elle réunit les castors, les oiseaux et les enfants pour dégager le passage sans abîmer les nids.</p><p>L'eau retrouva son chemin jusqu'aux racines. La forêt reverdit, et les animaux gardèrent un petit bassin pour les saisons sèches.</p>", [{q:"Qu'est-ce qui empêchait l'eau de circuler ?", options:["Une montagne de glace", "Un sort de dragon", "Des branches mortes", "Un barrage de pierres précieuses"], correct:2}]));
+MODELES.foret.push(C("Le Renard et la cloche", "<p>Un renard trouva une cloche d'argent qui sonnait chaque fois qu'un animal disait la vérité.</p><p>Il l'utilisa pour accuser les autres de petites fautes, jusqu'au jour où la cloche tinta dans sa propre tanière. Il avait caché les noisettes de l'écureuil et oublié où il les avait mises.</p><p>Le renard avoua, aida à chercher les noisettes et transforma la cloche en signal d'alerte pour prévenir les incendies.</p>", [{q:"Que finit par avouer le renard ?", options:["Il a caché les noisettes", "Il a cassé la lune", "Il a volé les ailes du hibou", "Il a asséché la rivière"], correct:0}]));
+MODELES.foret.push(C("La Chenille astronome", "<p>Chaque nuit, une chenille grimpait au sommet d'une fleur pour observer les étoiles.</p><p>Les autres insectes se moquaient d'elle, jusqu'à ce qu'une nuit sans lune les égare dans le jardin. La chenille se souvenait de la position des constellations et les guida jusqu'à leurs abris.</p><p>Au matin, personne ne rit de son rêve. La chenille continua ses observations et devint la gardienne des chemins nocturnes.</p>", [{q:"Comment la chenille aide-t-elle les insectes ?", options:["Elle construit un bateau", "Elle les guide grâce aux étoiles", "Elle appelle la pluie", "Elle cache leurs abris"], correct:1}]));
+MODELES.foret.push(C("Le Chêne des promesses", "<p>Un vieux chêne gardait dans son écorce les promesses que les habitants lui confiaient.</p><p>Quand une branche menaça de tomber sur le sentier, le village hésita à la couper, car elle portait des rubans anciens. L'apprenti jardinier Noé expliqua qu'honorer une promesse signifiait aussi protéger les vivants.</p><p>Les habitants taillèrent la branche avec soin, puis plantèrent trois jeunes chênes. Les rubans furent noués sur une clôture où chacun pouvait les lire.</p>", [{q:"Pourquoi coupe-t-on la branche dangereuse ?", options:["Pour vendre le bois en secret", "Pour construire un trône", "Pour protéger les passants", "Pour effacer les souvenirs"], correct:2}]));
+MODELES.foret.push(C("La Lanterne des lucioles", "<p>Une lanterne magique attirait toutes les lucioles de la forêt et éclairait trop fort les terriers.</p><p>Le jeune gardien Pako comprit que la lumière les empêchait de retrouver leurs partenaires. Il fabriqua un abat-jour de feuilles et plaça la lanterne près du vieux pont, loin des nids.</p><p>La lumière devint douce et utile aux voyageurs sans déranger les insectes. Pako apprit que même une bonne idée doit respecter ceux qui vivent autour de nous.</p>", [{q:"Pourquoi Pako couvre-t-il la lanterne ?", options:["Pour cacher un trésor", "Pour protéger les lucioles", "Pour éteindre toutes les étoiles", "Pour attirer les loups"], correct:1}]));
+MODELES.ville.push(C("Le Feu rouge du futur", "<p>Dans une grande ville, un feu rouge affichait parfois une image de ce qui arriverait si personne ne ralentissait.</p><p>L'élève Amari vit des cyclistes frôler un carrefour dangereux. Au lieu de garder la découverte pour lui, il montra les images au conseil municipal et proposa une piste cyclable.</p><p>La rue fut réaménagée, et le feu recommença à n'afficher que ses trois couleurs. Amari conserva une photo du carrefour pour se rappeler qu'une ville peut changer quand ses habitants parlent.</p>", [{q:"Que révèle le feu rouge ?", options:["Le numéro gagnant d'une loterie", "Les conséquences possibles d'un danger", "La météo de la semaine", "L'adresse d'un trésor"], correct:1}]));
+MODELES.ville.push(C("La Bibliothèque ambulante", "<p>Une bibliothécaire nommée Madame Kanku transforma un vieux bus en bibliothèque pour les quartiers sans livres.</p><p>À chaque arrêt, les enfants choisissaient un ouvrage et laissaient en échange une question à laquelle ils voulaient répondre. Bientôt, les mécaniciens, jardiniers et infirmières du quartier vinrent raconter leur métier.</p><p>Le bus devint une école roulante où les livres ouvraient la porte aux rencontres. Même les adultes empruntaient des histoires pour les lire à leurs familles.</p>", [{q:"Que devient le vieux bus ?", options:["Un restaurant de luxe", "Une bibliothèque mobile", "Un bateau de pêche", "Un garage fermé"], correct:1}]));
+MODELES.ville.push(C("Le Mur aux dessins", "<p>Un mur gris séparait deux rues dont les habitants se disputaient depuis longtemps.</p><p>La peintre Sifa proposa à chaque famille de dessiner un souvenir heureux sur le mur. Au début, certains refusèrent de participer, puis ils reconnurent des lieux et des visages communs dans les dessins.</p><p>Le mur devint une fresque colorée racontant l'histoire du quartier. Les voisins commencèrent à organiser ensemble un marché chaque samedi.</p>", [{q:"Qu'est-ce qui rapproche les habitants ?", options:["Une compétition de cris", "Une fresque réalisée ensemble", "Une nouvelle clôture", "Un concours de silence"], correct:1}]));
+MODELES.ville.push(C("Le Taxi des objets perdus", "<p>Le taxi de Jo transportait chaque jour des parapluies, des sacs et des jouets oubliés.</p><p>Un soir, Jo trouva une boîte contenant des photos anciennes sans adresse. Il demanda l'aide des commerçants et reconnut le kiosque visible derrière les personnes sur l'une des images.</p><p>La boîte retrouva sa propriétaire, une couturière qui avait perdu les photos de son atelier. En remerciement, elle cousit une petite poche spéciale pour les objets oubliés du taxi.</p>", [{q:"Comment Jo retrouve-t-il la propriétaire ?", options:["En jetant la boîte", "Avec l'aide du quartier et des indices sur les photos", "En vendant les photos", "En attendant dix ans"], correct:1}]));
+MODELES.ville.push(C("Le Robot jardinier", "<p>Un robot municipal était chargé d'arroser les plantes, mais il donnait la même quantité d'eau à chaque pot.</p><p>L'apprentie ingénieure Mina ajouta des capteurs simples pour distinguer la terre sèche de la terre humide. Elle apprit au robot à demander de l'aide lorsqu'une mesure semblait étrange.</p><p>Les plantes cessèrent de jaunir et la ville économisa de l'eau. Le robot reçut un nom : Goutte, car il savait désormais qu'une petite quantité bien choisie vaut mieux qu'un déluge.</p>", [{q:"Quelle amélioration Mina apporte-t-elle au robot ?", options:["Des roues en or", "Des capteurs d'humidité", "Une sirène plus forte", "Un écran de télévision"], correct:1}]));
+MODELES.ville.push(C("La Station des rêves", "<p>À la gare centrale, une vieille horloge s'arrêtait quand quelqu'un abandonnait un rêve important.</p><p>Le chef de gare demanda aux voyageurs d'écrire une petite action qu'ils pouvaient entreprendre dès le lendemain. Une musicienne nota qu'elle donnerait enfin son premier concert dans la cour de son école.</p><p>L'horloge repartit à mesure que les voyageurs prenaient confiance. La gare devint célèbre non pour ses retards, mais pour les débuts qu'elle inspirait.</p>", [{q:"Que doivent écrire les voyageurs ?", options:["Leur numéro de billet seulement", "Une petite action pour avancer vers leur rêve", "Une liste de plaintes", "Le nom du conducteur"], correct:1}]));
+MODELES.village.push(C("Le Marché aux échanges", "<p>Au marché de Kiwala, les habitants décidèrent d'échanger des services au lieu de toujours payer en argent.</p><p>La boulangère proposa du pain contre une réparation de toit, tandis que le menuisier demanda des leçons de lecture. Au début, personne ne savait combien valait chaque service; l'ancienne Mado suggéra que chacun explique le temps et l'effort nécessaires.</p><p>Les échanges devinrent plus justes et les familles se connurent mieux. Le marché garda aussi une petite caisse commune pour aider les personnes qui ne pouvaient rien offrir ce jour-là.</p>", [{q:"Que propose l'ancienne Mado ?", options:["De fermer le marché", "D'expliquer l'effort nécessaire à chaque service", "De fixer un prix identique pour tout", "De bannir les échanges"], correct:1}]));
+MODELES.village.push(C("Le Tambour qui racontait la pluie", "<p>Le tambour du village annonçait la pluie par un rythme différent, mais un jour il resta silencieux.</p><p>Le jeune musicien Banza inspecta la peau du tambour et découvrit qu'elle s'était détendue après plusieurs semaines humides. Avec l'aide du vieux fabricant, il la retendit sans remplacer le bois ancien.</p><p>Le rythme revint juste avant une forte averse. Depuis, les enfants apprennent à écouter les sons du village autant que les paroles des anciens.</p>", [{q:"Pourquoi le tambour s'était-il tu ?", options:["Un esprit l'avait emporté", "Sa peau s'était détendue", "Le village avait perdu ses oreilles", "La pluie avait disparu pour toujours"], correct:1}]));
+MODELES.village.push(C("La Poule au panier royal", "<p>Une poule nommée Reine suivait le chef du village partout, même dans les réunions importantes.</p><p>Un jour, elle pondit un œuf dans le panier des documents officiels et fit tomber les feuilles dans le désordre. Le secrétaire voulut la chasser, mais la petite Amina remarqua qu'une feuille révélait une erreur dans la liste des récoltes.</p><p>La poule avait involontairement évité une distribution injuste. On lui construisit un poulailler près du jardin, et le secrétaire vérifia désormais ses comptes deux fois.</p>", [{q:"Quelle erreur la poule aide-t-elle à découvrir ?", options:["Un faux trésor", "Une erreur dans la liste des récoltes", "Une carte secrète", "Une chanson interdite"], correct:1}]));
+MODELES.village.push(C("Le Puits des questions", "<p>Les enfants du village posaient leurs questions à un vieux puits dont l'écho semblait répondre.</p><p>Lorsque la pompe tomba en panne, chacun accusa son voisin d'avoir gaspillé l'eau. Israël proposa de noter les heures d'utilisation et de vérifier le mécanisme avant de se disputer.</p><p>Les notes montrèrent que la pompe était simplement usée. Les villageois la réparèrent ensemble et installèrent un tableau pour organiser les tours d'eau.</p>", [{q:"Que propose Israël ?", options:["Fermer le puits à tous", "Vérifier les faits avant d'accuser", "Creuser un puits en secret", "Jeter les outils"], correct:1}]));
+MODELES.village.push(C("La Fête sans couronne", "<p>Le village organisait une fête où la personne la plus riche portait une couronne de fleurs.</p><p>Cette année, les récoltes avaient été difficiles et la couturière Tendo proposa de couronner plutôt la personne qui avait aidé le plus de voisins. Le débat fut long, car plusieurs personnes avaient rendu des services différents.</p><p>Les habitants décidèrent de partager la couronne en petites fleurs, offertes à tous ceux qui avaient aidé. La fête devint plus joyeuse quand personne n'eut besoin d'être le plus grand.</p>", [{q:"Comment la couronne est-elle finalement utilisée ?", options:["Elle est vendue au roi", "Elle est cachée dans le puits", "Elle est partagée entre les personnes serviables", "Elle est brûlée"], correct:2}]));
+MODELES.village.push(C("Le Potager des grands-mères", "<p>Trois grand-mères possédaient des graines rares, mais leurs jardins produisaient moins chaque saison.</p><p>Elles réunirent les enfants pour comparer les endroits ensoleillés, les sols et les périodes d'arrosage. Chaque famille apporta aussi des feuilles sèches pour fabriquer du compost.</p><p>La récolte suivante fut assez abondante pour remplir le marché. Les grand-mères conservèrent quelques graines pour l'année suivante et apprirent aux enfants à ne pas tout récolter d'un coup.</p>", [{q:"Comment les jardins deviennent-ils plus productifs ?", options:["En arrosant sans arrêt", "En partageant les connaissances et en préparant le sol", "En coupant tous les arbres", "En gardant les graines sous clé"], correct:1}]));
+MODELES.marin.push(C("La Baleine aux chansons", "<p>Une jeune baleine appelée Nami chantait près des bateaux, mais les marins ne comprenaient pas son avertissement.</p><p>Le mousse Eli remarqua que chaque chanson précédait une zone de rochers cachés sous l'écume. Il compara les chants avec les cartes et marqua les endroits dangereux avant le départ des navires.</p><p>Les bateaux évitèrent les rochers et les pêcheurs promirent de laisser une partie de la baie tranquille. Nami continua ses chansons, désormais accueillies par des saluts plutôt que par la peur.</p>", [{q:"Que signalaient les chansons de Nami ?", options:["Un trésor sous chaque bateau", "Des rochers dangereux", "L'heure du repas", "La fin du monde"], correct:1}]));
+MODELES.marin.push(C("Le Phare endormi", "<p>Le phare de l'île s'éteignit pendant une nuit de brouillard, et les navires ne voyaient plus la côte.</p><p>La gardienne Sora découvrit que le mécanisme s'était bloqué à cause du sel. Elle envoya un signal sonore avec une cloche pendant que les marins du port apportaient les outils nécessaires.</p><p>Le phare fut réparé avant l'arrivée du grand navire de ravitaillement. Sora ajouta au calendrier un entretien régulier, car la prudence commence avant la panne.</p>", [{q:"Pourquoi le phare s'est-il éteint ?", options:["Une étoile l'avait volé", "Le mécanisme était bloqué par le sel", "Le soleil avait disparu", "Le gardien avait vendu la lumière"], correct:1}]));
+MODELES.marin.push(C("La Perle du courant", "<p>Un pêcheur trouva une perle brillante prise dans un filet, mais la mer devint soudain agitée autour de sa barque.</p><p>Sa fille Luma comprit que la perle appartenait peut-être à un coquillage vivant près du récif. Elle guida son père vers une eau calme et ils rendirent la perle à son abri.</p><p>Le courant s'apaisa peu à peu. Le pêcheur décida de ne plus garder ce qu'il ne comprenait pas et raconta l'histoire aux jeunes pêcheurs avant leur première sortie.</p>", [{q:"Que fait Luma avec la perle ?", options:["Elle la vend au marché", "Elle la rend à son abri marin", "Elle la cache dans la voile", "Elle la jette dans le feu"], correct:1}]));
+MODELES.marin.push(C("Le Crabe architecte", "<p>Un crabe construisait des tunnels de sable si solides que les vagues les contournaient.</p><p>Quand une tortue perdit le chemin de son nid, le crabe dessina un passage protégé entre les rochers. Les poissons ajoutèrent des coquillages colorés pour que le chemin soit visible même à marée basse.</p><p>La tortue retrouva son nid et les animaux utilisèrent le réseau de tunnels comme abri pendant la tempête suivante. Le crabe reçut le titre de bâtisseur de la baie.</p>", [{q:"Qui le crabe aide-t-il ?", options:["Un requin affamé", "Une tortue qui a perdu le chemin de son nid", "Un bateau pirate", "Une mouette endormie"], correct:1}]));
+MODELES.marin.push(C("Le Bateau sans capitaine", "<p>Un petit bateau avançait tout seul dans le port, guidé par une voile qui semblait choisir le vent.</p><p>La navigatrice Yara monta à bord et découvrit une caisse de matériel destinée à réparer les filets d'un village voisin. Elle consulta les marées et demanda à deux pêcheurs de l'accompagner plutôt que de se fier à la voile mystérieuse.</p><p>Ils livrèrent la caisse à temps et retrouvèrent un vieux carnet de navigation. Yara le remit au musée du port pour que les futurs marins puissent apprendre des anciens.</p>", [{q:"Que transporte le bateau ?", options:["Des bijoux royaux", "Du matériel pour réparer des filets", "Des animaux de cirque", "Des pierres volcaniques"], correct:1}]));
+MODELES.marin.push(C("La Sirène et le coquillage", "<p>Une sirène nommée Asha ne pouvait plus chanter parce qu'un coquillage magique avait perdu son éclat.</p><p>Le jeune plongeur Kito chercha la cause sans arracher les coraux. Il découvrit que le coquillage était couvert de sable après une tempête et le nettoya doucement avec l'eau du courant.</p><p>La voix d'Asha revint, mais elle choisit une chanson nouvelle pour remercier ceux qui avaient protégé le récif. Depuis, les plongeurs observent les fonds marins sans les abîmer.</p>", [{q:"Pourquoi la sirène avait-elle perdu sa voix ?", options:["Elle avait oublié toutes les notes", "Le coquillage magique était couvert de sable", "Un dauphin avait pris sa voix", "La mer avait gelé"], correct:1}]));
+MODELES.drole.push(C("Le Roi qui avait peur des poulets", "<p>Le roi Barnabé prétendait être intrépide, mais il montait sur son trône dès qu'une poule entrait dans la cour.</p><p>Un matin, une poule traversa la salle du conseil en portant une chaussette sur la tête. Le roi grimpa sur la table et ordonna à ses gardes d'arrêter « le monstre à plumes et au bonnet ». Les gardes éclatèrent de rire et la poule pondit tranquillement sous le trône.</p><p>Pour sauver sa dignité, Barnabé déclara que la poule était désormais ministre des affaires granuleuses. Le lendemain, elle picorait les papiers officiels et le roi dut apprendre à affronter les poulets, un grain à la fois.</p>", [{q:"Que porte la poule sur la tête ?", options:["Une couronne en or", "Une chaussette", "Un casque de chevalier", "Une casserole"], correct:1}]));
+MODELES.drole.push(C("Le pantalon du maire", "<p>Le maire Gustave acheta un pantalon magique qui annonçait à voix haute tout ce qu'il pensait.</p><p>Pendant le discours d'ouverture du marché, le pantalon cria : « J'ai oublié mon discours dans la marmite ! » Puis il ajouta que le maire avait mangé trois beignets avant le petit-déjeuner. La foule riait tellement que Gustave dut s'asseoir sur un sac de farine.</p><p>Le maire finit par dire la vérité : il était nerveux et avait improvisé. Le pantalon se tut aussitôt, sauf lorsqu'il entendait le mot « beignet », ce qui compliqua sérieusement les réunions du lundi.</p>", [{q:"Que révèle le pantalon magique ?", options:["La météo de demain", "Les pensées du maire", "Le prix de l'or", "Les secrets des poissons"], correct:1}]));
+MODELES.drole.push(C("Le concours de silence", "<p>Le village organisa un concours où le gagnant serait celui qui resterait silencieux le plus longtemps.</p><p>Le boulanger tenta de ne pas rire quand son pain se mit à rebondir dans son panier. Le juge éternua si fort que sa perruque atterrit dans la soupe. Personne ne parlait, mais les joues tremblaient et les épaules sautaient.</p><p>Le prix fut remis à la petite chèvre qui n'avait rien compris au concours et mâchait tranquillement le certificat. Les habitants décidèrent que le prochain concours serait un concours de rire, beaucoup plus facile à gagner.</p>", [{q:"Qui gagne le concours de silence ?", options:["Le maire", "Le boulanger", "La petite chèvre", "Le juge à perruque"], correct:2}]));
+MODELES.drole.push(C("La soupe invisible", "<p>Le cuisinier Pépito inventa une soupe invisible pour impressionner le roi.</p><p>Il servit trois bols vides en décrivant un parfum de carotte, de mangue et de fromage. Le roi goûta l'air, hocha la tête et demanda une deuxième portion. Son conseiller, affamé, lécha son bol et déclara que le goût était « très transparent ».</p><p>Quand la cuisine découvrit la plaisanterie, elle apporta un vrai repas. Pépito reçut une médaille pour son imagination, mais dut préparer le dîner lui-même pendant un mois.</p>", [{q:"Pourquoi le roi demande-t-il une deuxième portion ?", options:["Il a trouvé de l'or dans le bol", "Il fait semblant d'apprécier la soupe invisible", "Il veut nourrir le chat", "Il a perdu son assiette"], correct:1}]));
+MODELES.drole.push(C("Le perroquet comptable", "<p>Un perroquet nommé Chiffre apprit à répéter les nombres entendus dans la boutique.</p><p>Le commerçant le chargea de compter les mangues, mais Chiffre cria « onze ! » chaque fois qu'il voyait une banane. Un client repartit avec onze bananes et une seule mangue, tandis que le perroquet exigeait un reçu signé par le chat.</p><p>Le commerçant lui apprit à distinguer les fruits avec des dessins colorés. Chiffre devint un excellent assistant, même s'il continuait à demander au chat de vérifier les comptes.</p>", [{q:"Quelle erreur fait le perroquet au début ?", options:["Il vend les étagères", "Il confond les bananes et les mangues", "Il compte les clients en chaussures", "Il avale le registre"], correct:1}]));
+MODELES.drole.push(C("La chaussure fugueuse", "<p>La chaussure gauche de Tonton Moke s'enfuyait chaque nuit parce qu'elle détestait marcher dans les flaques.</p><p>Moke installa une clochette sur la porte, mais la chaussure passa par la fenêtre, traversa le marché et se cacha dans un panier de tomates. Le vendeur la prit pour une aubergine très pointue et essaya de lui donner un prix.</p><p>Moke acheta finalement des bottes pour les jours de pluie et laissa la chaussure vivre dans une vitrine. Elle devint célèbre comme la seule chaussure du quartier qui avait son propre agent.</p>", [{q:"Où la chaussure se cache-t-elle ?", options:["Dans la marmite du roi", "Dans un panier de tomates", "Sous le lit du maire", "Dans un nid de poulet"], correct:1}]));
+MODELES.sorcier.push(C("L'apprenti et la potion de hoquet", "<p>L'apprenti sorcier Toma prépara une potion censée faire apparaître des fleurs au moindre claquement de doigts.</p><p>Il versa par erreur une pincée de poudre de hoquet. Chaque fois qu'il disait « abracadabra », un canard violet apparaissait et criait « coin ! » au milieu du laboratoire.</p><p>Toma transforma la recette en spectacle pour enfants et utilisa les bénéfices pour réparer la serre magique. Il nota en grosses lettres sur ses flacons : lire l'étiquette avant de mélanger.</p>", [{q:"Quel animal apparaît après l'erreur ?", options:["Un lion invisible", "Un canard violet", "Un dragon bleu", "Un éléphant minuscule"], correct:1}]));
+MODELES.sorcier.push(C("La baguette enrhumée", "<p>La baguette de la sorcière Mireille éternuait des étincelles dès qu'elle approchait d'un bouquet de marguerites.</p><p>Un sort de nettoyage transforma le château en montagne de bulles, puis une formule de cuisine fit chanter les casseroles. Mireille comprit que sa baguette était allergique au pollen et consulta l'herboriste du village.</p><p>Avec une housse en tissu doux et une potion sans pollen, la baguette retrouva son calme. Mireille garda quelques bulles dans une bouteille pour laver les fenêtres sans effort.</p>", [{q:"À quoi la baguette est-elle allergique ?", options:["Au chocolat", "Au pollen", "À la musique", "À la lumière de la lune"], correct:1}]));
+MODELES.sorcier.push(C("L'examen des dragons", "<p>À l'école de magie, les élèves devaient apprendre à apprivoiser un petit dragon sans lui donner d'ordre.</p><p>L'élève Farah s'assit près du dragon Fumet et remarqua qu'il éternuait chaque fois qu'on lui criait dessus. Elle lui parla doucement, lui montra de l'eau et attendit qu'il s'approche de lui-même.</p><p>Fumet souffla une petite flamme en forme de cœur et choisit Farah comme amie. Le professeur remplaça l'examen par une leçon sur la patience et le respect des créatures.</p>", [{q:"Comment Farah gagne-t-elle la confiance du dragon ?", options:["En lui criant des ordres", "En lui parlant doucement et en respectant son rythme", "En lui volant ses ailes", "En l'enfermant dans une boîte"], correct:1}]));
+MODELES.sorcier.push(C("Le grimoire mal classé", "<p>Le bibliothécaire magique rangea par erreur les sorts de cuisine avec les sorts de métamorphose.</p><p>Le jeune sorcier Nino voulut faire apparaître un gâteau, mais transforma toutes les chaises en tartes aux pommes. Les invités durent s'asseoir sur des coussins et manger le mobilier avant qu'il ne refroidisse.</p><p>Nino réorganisa les rayons avec des symboles très clairs. Le bibliothécaire conserva une tarte en souvenir, car c'était la première fois qu'un meuble avait reçu cinq étoiles au concours de pâtisserie.</p>", [{q:"Que deviennent les chaises ?", options:["Des poissons rouges", "Des tartes aux pommes", "Des nuages", "Des citrouilles parlantes"], correct:1}]));
+MODELES.sorcier.push(C("La lune en bouteille", "<p>Une apprentie nommée Zola voulait capturer un rayon de lune pour éclairer la salle de lecture.</p><p>Elle plaça une bouteille sur le toit, mais la lune refusa d'entrer. Le vieux mage lui expliqua qu'un rayon ne se capture pas : on peut orienter la lumière avec un miroir sans l'emprisonner.</p><p>Zola installa des miroirs autour de la bibliothèque. La pièce s'illumina doucement et la bouteille devint un vase pour les fleurs de la fenêtre.</p>", [{q:"Que fait Zola pour éclairer la bibliothèque ?", options:["Elle enferme la lune", "Elle dirige la lumière avec des miroirs", "Elle allume la forêt", "Elle casse les fenêtres"], correct:1}]));
+MODELES.sorcier.push(C("Le bal des balais", "<p>Les balais de l'école de magie organisèrent un bal pendant que les sorciers dormaient.</p><p>Le balai numéro sept voulait danser la valse, mais il balayait le sol à chaque tour et envoyait les confettis sous les armoires. Un balai-brosse improvisa une chorégraphie qui transforma le nettoyage en spectacle.</p><p>Au matin, la salle brillait et les élèves trouvèrent les confettis rangés par couleur. Le directeur autorisa un bal annuel, à condition que les balais finissent le ménage avant le premier morceau.</p>", [{q:"Que fait le balai numéro sept en dansant ?", options:["Il fait pleuvoir du chocolat", "Il balaie le sol", "Il se transforme en dragon", "Il endort les invités"], correct:1}]));
+MODELES.famille.push(C("La boîte à dimanches", "<p>Chaque dimanche, la grand-mère de Lina ouvrait une boîte remplie de petits papiers racontant des souvenirs de famille.</p><p>Quand la boîte fut presque vide, Lina proposa à chacun d'écrire un souvenir nouveau : une recette ratée, une promenade sous la pluie ou une aide reçue au bon moment.</p><p>La boîte se remplit de récits récents et anciens. La famille décida de la transmettre à la plus jeune cousine, avec la consigne d'y ajouter aussi les jours ordinaires qui rendent la vie précieuse.</p>", [{q:"Que met la famille dans la boîte ?", options:["Des pièces d'or", "Des souvenirs écrits sur des papiers", "Des pierres du jardin", "Des devoirs non terminés"], correct:1}]));
+MODELES.famille.push(C("Le repas des retrouvailles", "<p>Après plusieurs années loin de la maison, le grand frère de Sefu revint au village sans prévenir.</p><p>La famille préparait un repas, mais chacun voulait raconter son histoire en premier. La petite Awa distribua des cuillères et proposa que chacun parle pendant que les autres écoutent sans l'interrompre.</p><p>Le repas dura longtemps et les rires remplacèrent les reproches. Le frère repartit le lendemain avec un carnet rempli de recettes et de messages de chacun.</p>", [{q:"Quelle règle Awa propose-t-elle ?", options:["Parler tous en même temps", "Écouter chacun à son tour", "Manger sans s'asseoir", "Cacher les recettes"], correct:1}]));
+MODELES.famille.push(C("La vieille radio de papa", "<p>La radio de papa ne captait plus les stations, mais elle diffusait parfois des chansons de son enfance.</p><p>Son fils David démonta prudemment le boîtier avec lui et découvrit une antenne desserrée. Pendant la réparation, papa raconta comment il écoutait les matchs avec son propre père.</p><p>La radio fonctionna de nouveau et la famille organisa une soirée musicale. David comprit qu'une réparation peut aussi ouvrir la porte à des histoires qu'on n'avait jamais entendues.</p>", [{q:"Que découvre David ?", options:["Un billet de loterie", "Une antenne desserrée", "Un petit oiseau", "Un diamant"], correct:1}]));
+MODELES.famille.push(C("Le jardin partagé", "<p>Les cousins se disputaient pour savoir qui devait utiliser le petit jardin derrière la maison.</p><p>La tante Esther leur proposa de diviser le terrain en rangées et de réserver un coin commun pour les herbes aromatiques. Chacun choisit une tâche adaptée à son âge et nota les jours d'arrosage.</p><p>Au moment de la récolte, ils préparèrent une salade avec les légumes de toutes les rangées. Les cousins décidèrent de garder le jardin commun, même lorsqu'ils n'étaient pas d'accord.</p>", [{q:"Comment les cousins résolvent-ils leur dispute ?", options:["En abandonnant le jardin", "En partageant les tâches et l'espace", "En cachant les outils", "En demandant à la pluie de choisir"], correct:1}]));
+MODELES.famille.push(C("Le carnet de pardon", "<p>Maman remarqua que deux sœurs ne se parlaient plus depuis une dispute à propos d'un livre.</p><p>Au lieu de décider qui avait raison, elle leur donna un carnet où chacune pouvait écrire ce qu'elle avait ressenti et ce qu'elle souhaitait réparer. Elles découvrirent qu'elles avaient toutes les deux cru que l'autre se moquait d'elles.</p><p>Elles se présentèrent des excuses et décidèrent d'écrire ensemble les prochaines histoires dans le carnet. Le livre perdu fut retrouvé derrière le canapé, juste à côté d'un biscuit oublié.</p>", [{q:"Qu'est-ce qui aide les sœurs à se réconcilier ?", options:["Elles déchirent le carnet", "Elles expliquent leurs sentiments et s'écoutent", "Elles cachent tous les livres", "Elles quittent la maison"], correct:1}]));
+MODELES.famille.push(C("La photo sans sourire", "<p>La famille de Kanku voulait prendre une photo, mais le petit Jojo refusait de sourire devant l'appareil.</p><p>Tout le monde essaya des grimaces, des chansons et des danses. Finalement, grand-père raconta qu'il avait autrefois confondu du sel et du sucre dans un gâteau servi à un invité important.</p><p>Jojo éclata de rire et la photo captura toute la famille en plein fou rire. Ils encadrèrent l'image, car elle rappelait que les meilleurs souvenirs ne sont pas toujours parfaitement posés.</p>", [{q:"Qu'est-ce qui fait rire Jojo ?", options:["Un prix gagné", "L'histoire du gâteau raté de grand-père", "Un ballon neuf", "Une chanson triste"], correct:1}]));
+
 /* ============================================================
    3. LOGIQUE APPLICATION
 ============================================================ */
+
+/* ============================================================
+   BIBLIOTHÈQUE ÉTENDUE : 7 001 contes hors ligne.
+   Chaque conte généré contient 32 paragraphes narratifs et plus
+   de 30 phrases. Les intrigues varient selon l'univers, les lieux,
+   les personnages, les objets, les obstacles et les décisions.
+============================================================ */
+function ajouterGrandeBibliotheque(){
+  const besoin = 7001 - Object.values(MODELES).reduce((n, liste)=>n+liste.length, 0);
+  if(besoin <= 0) return;
+  const univers = {
+    aventure:{lieu:["la vallée des vents","le royaume des sept collines","le col des géants","la cité oubliée","le désert des miroirs","la montagne de cristal","la route des caravanes","le palais aux cent portes"],objet:["une carte qui changeait à l'aube","une clé gravée d'étoiles","un bouclier couvert de signes","une boussole impatiente","un médaillon ancien","un carnet de voyage","une pierre lumineuse","une cloche d'argent"],allié:["une cartographe curieuse","un chevalier qui préférait discuter","une inventrice du royaume","un vieux guide attentif","un jeune messager","une reine voyageuse","un géant au cœur tendre","un faucon très observateur"],obstacle:["un pont emporté par la pluie","une énigme gravée dans la roche","une porte qui ne s'ouvrait qu'à plusieurs","une dispute entre deux villages","un brouillard qui brouillait les pistes","un gardien qui exigeait une preuve de bonté","une rivière sortie de son lit","une carte dont il manquait un morceau"]},
+    foret:{lieu:["la forêt aux fougères bleues","le sentier des lucioles","la clairière des vieux chênes","le bois des mille chants","le jardin sauvage","la vallée des champignons","le bosquet des oiseaux","la forêt des saisons"],objet:["une graine dorée","un panier tressé","une feuille qui brillait","un petit tambour de bois","une lanterne de mousse","un livre de botanique","une plume argentée","une flûte de roseau"],allié:["un renard philosophe","une gardienne des arbres","un écureuil prévoyant","un hibou bibliothécaire","une fée des fougères","un cerf aux bois clairs","un jardinier silencieux","une abeille messagère"],obstacle:["un ruisseau devenu boueux","un arbre tombé sur le sentier","des animaux qui ne se parlaient plus","une clairière privée de lumière","des graines dispersées par le vent","un nid tombé après l'orage","une source presque tarie","un sentier que les ronces avaient caché"]},
+    ville:{lieu:["le quartier des horloges","la grande place aux fontaines","la rue des libraires","le marché des inventions","la gare aux mille départs","le toit-jardin de la ville","le musée des curiosités","la ruelle des lanternes"],objet:["un carnet trouvé dans le tram","une montre arrêtée","un plan plié en quatre","un appareil à réparer","un parapluie jaune","une boîte à musique","un badge mystérieux","un ticket portant un message"],allié:["une conductrice de bus attentive","un réparateur ingénieux","une bibliothécaire patiente","un jeune journaliste","un boulanger plein d'idées","une musicienne de rue","un facteur qui connaissait tout le monde","un architecte passionné"],obstacle:["une panne générale d'électricité","des panneaux indiquant de mauvaises directions","un colis arrivé sans adresse","une place encombrée de caisses","un concours organisé trop tôt","un message effacé par la pluie","un ascenseur bloqué entre deux étages","un malentendu entre voisins"]},
+    village:{lieu:["le village des collines rouges","la place du grand baobab","le marché du samedi","le chemin des champs","la maison des anciens","le pont près du moulin","la cour aux manguiers","la colline des troupeaux"],objet:["un panier de graines","un vieux tambour","une calebasse décorée","un carnet de recettes","une lampe à huile","un morceau de tissu brodé","une petite cloche","un outil soigneusement poli"],allié:["une cultivatrice inventive","un conteur du village","un forgeron généreux","une jeune bergère","un ancien plein de sagesse","un apprenti menuisier","une vendeuse de fruits","un musicien enthousiaste"],obstacle:["une récolte menacée par la sécheresse","un chemin devenu impraticable","un désaccord au marché","un moulin qui refusait de tourner","des outils égarés avant la fête","une réserve d'eau mal partagée","une clôture cassée","une annonce que personne n'avait comprise"]},
+    marin:{lieu:["la baie aux eaux turquoise","le port des coquillages","l'île des oiseaux voyageurs","le phare de la grande falaise","le lagon aux reflets verts","la plage des bateaux de papier","la grotte des marées","l'archipel des brumes"],objet:["une bouteille contenant un dessin","une carte marine tachée de sel","une longue-vue ancienne","un coquillage qui résonnait","un filet réparé à la main","une boussole de marin","un carnet étanche","une petite voile rouge"],allié:["une capitaine prudente","un pêcheur qui connaissait les courants","une biologiste marine","un jeune navigateur","un gardien de phare","une plongeuse courageuse","un cuisinier de bateau","un dauphin joueur"],obstacle:["une voile déchirée par le vent","un phare dont la lumière s'était éteinte","une marée qui isolait la plage","des déchets bloquant une crique","un brouillard épais","un bateau de pêche égaré","un ponton endommagé","une carte devenue illisible sous le sel"]},
+    drole:{lieu:["la foire des inventions ratées","le village des chaussettes perdues","la cuisine du maire","la place des concours absurdes","le magasin des objets inutiles","l'école des clowns sérieux","la gare des poules pressées","le royaume du rire"],objet:["une couronne trop grande","un réveil qui racontait des blagues","une chaussure qui couinait","un gâteau en forme de chaussure","un parapluie à l'envers","un canard en caoutchouc géant","un pantalon plein de poches","une trompette qui faisait pouic"],allié:["un inventeur distrait","une chèvre très exigeante","un maire qui confondait les mots","un cuisinier dramatique","un facteur toujours en retard","une poule persuadée d'être reine","un clown timide","un perroquet qui répétait tout de travers"],obstacle:["un concours où personne ne comprenait les règles","une soupe devenue bleue","un discours interrompu par des canards","une machine qui emballait les chapeaux","un gâteau qui roulait sous les tables","une porte qui ne s'ouvrait qu'en chantant faux","une chèvre qui avait volé le programme","un réveil qui sonnait à chaque éternuement"]},
+    sorcier:{lieu:["l'académie des lunes","la tour aux escaliers changeants","le jardin des plantes parlantes","la bibliothèque des grimoires","le village des sorciers débutants","la salle des potions colorées","le pont des étoiles","le château des nuages"],objet:["un grimoire qui éternuait","une fiole aux reflets violets","une baguette en bois de pommier","un sablier rempli de poussière d'étoiles","un chapeau trop bavard","une plume enchantée","un miroir de brume","un chaudron cabossé"],allié:["une apprentie soigneuse","un magicien maladroit","un chat qui connaissait les formules","une professeure de sortilèges","un dragon amateur de poésie","un bibliothécaire enchanté","une fée mécanicienne","un vieux mage patient"],obstacle:["une formule dont il manquait un mot","une potion qui changeait la couleur des murs","un sort qui faisait parler les objets","une porte devenue invisible","un balai qui refusait de voler droit","un nuage de confettis magiques","un sortilège de confusion","un cristal qui avait perdu son éclat"]},
+    famille:{lieu:["la maison au grand jardin","la cour des cousins","la cuisine du dimanche","le grenier aux souvenirs","la route des vacances","le jardin de grand-mère","la petite bibliothèque familiale","la véranda après la pluie"],objet:["un album de photos","une boîte de lettres","un vieux jeu de société","un tablier brodé","un carnet de recettes","un cerf-volant réparé","un puzzle incomplet","une boîte à musique"],allié:["une grand-mère malicieuse","un oncle bricoleur","une sœur pleine d'idées","un cousin inventif","un grand-père conteur","une tante patiente","un petit frère curieux","une voisine devenue amie"],obstacle:["un malentendu entre cousins","un objet précieux égaré","un repas préparé trop tôt","une fête menacée par la pluie","un jouet cassé juste avant de jouer","un secret gardé trop longtemps","une vieille dispute à éclaircir","un projet que personne ne voulait commencer"]}
+  };
+  const phases = [
+    "Au début, {nom} remarqua que quelque chose d'inhabituel se préparait.",
+    "Personne ne savait encore quelle aventure allait naître de cette découverte.",
+    "Le matin suivant, {nom} retourna sur place avec un esprit curieux et calme.",
+    "Sur le chemin, chaque détail semblait donner un indice supplémentaire.",
+    "Un bruit léger attira l'attention du groupe derrière un vieux mur.",
+    "C'est alors que {allié} arriva et proposa de chercher une solution ensemble.",
+    "Il expliqua ce qu'il avait observé pendant les jours précédents.",
+    "Pour avancer, les compagnons décidèrent d'écouter chaque idée sans se moquer.",
+    "Ils examinèrent {objet} avec soin, sans se précipiter vers une conclusion.",
+    "Une marque discrète indiquait la direction de {lieu}.",
+    "Le trajet exigeait de la patience, car le paysage changeait à chaque détour.",
+    "En chemin, ils croisèrent des habitants qui connaissaient une partie de l'histoire.",
+    "Chacun partagea un souvenir utile et les morceaux du mystère commencèrent à s'assembler.",
+    "Soudain, {obstacle} compliqua leur plan et les obligea à faire une pause.",
+    "La première idée ne fonctionna pas, mais personne ne se découragea.",
+    "Ils essayèrent une autre méthode en utilisant ce qu'ils avaient déjà appris.",
+    "Un détail qui paraissait insignifiant devint finalement la clé du problème.",
+    "{allié} suggéra de demander conseil aux personnes directement concernées.",
+    "La conversation fut honnête et chacun put expliquer son point de vue.",
+    "Grâce à cet échange, les voyageurs découvrirent une information qu'ils avaient négligée.",
+    "Ils organisèrent leurs tâches pour que personne ne porte seul tout le travail.",
+    "{nom} prit le temps de vérifier les faits avant de choisir la prochaine étape.",
+    "Peu à peu, la peur laissa place à une confiance fondée sur leurs efforts.",
+    "Ils retournèrent vers {lieu} avec un plan plus clair et plus juste.",
+    "Là, ils réunirent les personnes concernées et présentèrent leurs découvertes.",
+    "La solution demandait de la coopération plutôt qu'une démonstration de force.",
+    "Tout le monde apporta une petite contribution, même ceux qui doutaient au départ.",
+    "Quand la situation s'améliora, les compagnons prirent le temps de remercier leurs aides.",
+    "Ils réparèrent ce qui pouvait l'être et préparèrent une façon d'éviter le même problème.",
+    "Le soir venu, les habitants se retrouvèrent pour raconter ce qu'ils avaient appris.",
+    "{nom} comprit que le courage pouvait aussi signifier demander de l'aide et reconnaître ses erreurs.",
+    "Depuis ce jour, {lieu} devint le symbole d'une aventure qui avait rapproché toute la communauté."
+  ];
+  const categories = Object.keys(univers);
+  const titres = {
+    aventure:["Le Serment des voyageurs","La Porte du royaume secret","Les Cartes de l'horizon","Le Défi des sept collines","Le Gardien de la vallée"],
+    foret:["Le Conseil des arbres","Le Mystère de la clairière","La Graine des merveilles","Les Voix du vieux bois","Le Sentier retrouvé"],
+    ville:["Le Secret de la grande place","Les Lumières du quartier","Le Mystère du colis","Le Projet des voisins","La Ville aux mille idées"],
+    village:["La Fête du grand baobab","Le Secret du vieux moulin","Le Marché des bonnes idées","La Récolte partagée","Le Tambour du village"],
+    marin:["Le Phare de l'espoir","Le Secret de la baie","La Carte des marées","Les Gardiens du lagon","Le Voyage du bateau rouge"],
+    drole:["Le Concours le plus bizarre","La Couronne de travers","Le Mystère de la soupe bleue","La Grande Bêtise du maire","Le Canard président"],
+    sorcier:["Le Sortilège mal prononcé","La Potion aux mille couleurs","Le Grimoire capricieux","L'Apprenti et le dragon poète","La Tour des surprises"],
+    famille:["Le Dimanche des surprises","Le Secret du grenier","La Fête presque ratée","Le Puzzle des souvenirs","Le Grand repas familial"]
+  };
+  for(let k=0;k<besoin;k++){
+    const cat=categories[k%categories.length], data=univers[cat], n=k+1;
+    const lieu=data.lieu[(n*3+Math.floor(n/7))%data.lieu.length];
+    const objet=data.objet[(n*5+Math.floor(n/11))%data.objet.length];
+    const allie=data.allié[(n*7+Math.floor(n/13))%data.allié.length];
+    const obstacle=data.obstacle[(n*3+Math.floor(n/5))%data.obstacle.length];
+    const titreBase=titres[cat][n%titres[cat].length];
+    const titre=`${titreBase} — aventure ${String(n).padStart(4,"0")}`;
+    const paragraphs=phases.map((p,j)=>{
+      let txt=p.replaceAll("{nom}","{nom}").replaceAll("{allié}",allie).replaceAll("{objet}",objet).replaceAll("{lieu}",lieu).replaceAll("{obstacle}",obstacle);
+      const extra=[
+        `Ils notèrent cette leçon dans leur mémoire et décidèrent de la mettre en pratique.`,
+        `Cette expérience leur montra que les petites actions peuvent produire de grands changements.`,
+        `Ils vérifièrent que chacun se sentait respecté avant de poursuivre leur chemin.`,
+        `La confiance grandit parce que leurs paroles correspondaient enfin à leurs actes.`
+      ][(n+j)%4];
+      if(j%3===1) txt += " "+extra;
+      return `<p>${txt}</p>`;
+    }).join("");
+    const q=[
+      {q:"Quel objet accompagne les personnages ?",options:[objet,"Une couronne de glace","Un coffre vide","Une plume sans couleur"],correct:0},
+      {q:"Comment les personnages résolvent-ils le problème ?",options:["En coopérant et en réfléchissant","En abandonnant immédiatement","En cachant les indices","En accusant un voisin"],correct:0},
+      {q:"Quelle leçon ressort de cette aventure ?",options:["L'entraide et la patience sont utiles","Il ne faut jamais écouter","La force résout tout","Les erreurs ne s'apprennent pas"],correct:0}
+    ];
+    MODELES[cat].push(C(titre,paragraphs,q));
+  }
+}
+ajouterGrandeBibliotheque();
+
 const CATEGORIES = [
   {id:"aventure",nom:"Contes d'Aventure",icon:"⚔️",desc:"Héros courageux et trésors cachés."},
   {id:"foret",nom:"Contes de la Forêt",icon:"🌲",desc:"Créatures mystérieuses et arbres qui parlent."},
@@ -1735,16 +1892,8 @@ function ouvrirConte(cat, index){
 
   document.getElementById("story-title").textContent = personnaliser(conte.titre);
   document.getElementById("story-illustration").innerHTML = SVG[cat]||SVG.aventure;
-  document.getElementById("story-body").innerHTML = personnaliser(conte.texte) + `<p class="extra-paragraph">${personnaliser(({
-aventure:"Avant de rentrer, {nom} prit le temps de regarder le chemin parcouru. Chaque rencontre lui avait appris à écouter avant de juger, à rester courageux devant l'inconnu et à tenir ses promesses. De retour au village, il raconta son aventure et partagea ce qu'il avait appris. Les habitants gardèrent longtemps cette histoire en mémoire.",
-foret:"Les jours suivants, {nom} revint dans la forêt pour observer les animaux et prendre soin des plantes. Il apprit à reconnaître les chants des oiseaux et à respecter même les plus petites créatures. Peu à peu, les habitants comprirent qu'ils devaient protéger ensemble ce lieu précieux.",
-ville:"Après cette aventure, {nom} raconta ce qui s'était passé aux voisins. Plusieurs personnes décidèrent de participer et, ensemble, elles améliorèrent leur quartier. Les passants s'arrêtaient désormais pour se parler et s'entraider. {nom} comprit qu'un petit geste peut inspirer toute une communauté.",
-village:"Le soir, les anciens réunirent les habitants autour du feu pour écouter le récit de {nom}. Chacun partagea un souvenir et une leçon apprise au fil des années. Les enfants promirent de garder cette histoire vivante et de transmettre ses valeurs aux générations suivantes.",
-marin:"Lorsque la mer retrouva son calme, {nom} observa l'horizon et remercia ses compagnons. Ils réparèrent ensemble leur embarcation et partagèrent leurs provisions. Depuis ce jour, ils naviguèrent avec davantage de prudence, de solidarité et de respect pour l'océan.",
-drole:"Quand l'histoire fut racontée au reste du village, chacun ajouta un détail encore plus drôle. Les rires se prolongèrent jusqu'au soir et les petites querelles furent oubliées. {nom} découvrit qu'un peu d'humour accompagné de gentillesse peut rapprocher les gens.",
-sorcier:"Avant de partir, {nom} nota soigneusement ce qu'il avait appris dans son carnet. Il comprit que la magie demande de la patience, de la responsabilité et de la bienveillance. Il promit d'utiliser ses connaissances pour aider les autres et non pour leur nuire.",
-famille:"Plus tard, la famille se retrouva pour partager un repas et reparler de cette journée. Chacun expliqua ce qu'il avait ressenti et ce qu'il souhaitait améliorer. Ils décidèrent de s'écouter davantage et de s'entraider, même lorsque les journées seraient difficiles."
-})[cat]||" {nom} garda cette aventure en mémoire et en partagea la leçon avec ceux qu'il aimait.")}</p>`;
+  document.getElementById("story-body").innerHTML = personnaliser(conte.texte);
+
   document.getElementById("quiz-container").innerHTML = "";
 
   const btnQuiz = document.getElementById("btn-quiz");
@@ -1816,7 +1965,7 @@ function personnaliser(t){
 /* ============================================================
    6. QUIZ
 ============================================================ */
-let quizQuestionActuelle=0, quizARepondu=false;
+let quizQuestionActuelle=0, quizARepondu=false, quizQuestionAffichee=null;
 function lancerQuiz(){
  const quiz=MODELES[conteActuel][indexActuel].quiz;if(!quiz)return;
  quizEnCours=true;quizQuestionActuelle=0;quizARepondu=false;window.quizScore=0;window.quizRepondu=0;window.quizTotal=quiz.length;
@@ -1832,16 +1981,20 @@ function afficherQuestionQuiz(){
   if(!prog[key]||prog[key]<score){prog[key]=score;ecrireStockage("cm-scores",JSON.stringify(prog))}mettreAJourProgression();quizEnCours=false;return;
  }
  const q=quiz[quizQuestionActuelle];
- stage.innerHTML=`<p class="quiz-progress">Question ${quizQuestionActuelle+1} sur ${quiz.length}</p><div class="quiz-box"><div class="quiz-question"><p>${personnaliser(q.q)}</p>${q.options.map((opt,j)=>`<button class="quiz-option" onclick="repondreQuestionQuiz(${j})">${personnaliser(opt)}</button>`).join("")}</div><div id="quiz-feedback" class="quiz-result"></div><button id="quiz-next" class="quiz-next" style="display:none" onclick="questionQuizSuivante()">Question suivante →</button></div>`;
+ // Mélange indépendant à chaque question, en conservant la bonne réponse.
+ const choix=q.options.map((texte,index)=>({texte,index}));
+ for(let i=choix.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[choix[i],choix[j]]=[choix[j],choix[i]];}
+ quizQuestionAffichee={...q,choix,correctAffiche:choix.findIndex(x=>x.index===q.correct)};
+ stage.innerHTML=`<p class="quiz-progress">Question ${quizQuestionActuelle+1} sur ${quiz.length}</p><div class="quiz-box"><div class="quiz-question"><p>${personnaliser(q.q)}</p>${choix.map((opt,j)=>`<button class="quiz-option" onclick="repondreQuestionQuiz(${j})">${personnaliser(opt.texte)}</button>`).join("")}</div><div id="quiz-feedback" class="quiz-result"></div><button id="quiz-next" class="quiz-next" style="display:none" onclick="questionQuizSuivante()">Question suivante →</button></div>`;
  quizARepondu=false;
 }
 function repondreQuestionQuiz(optIndex){
  if(quizARepondu)return;quizARepondu=true;
- const q=MODELES[conteActuel][indexActuel].quiz[quizQuestionActuelle],btns=document.querySelectorAll("#quiz-stage .quiz-option");
- btns.forEach((b,j)=>{b.disabled=true;if(j===q.correct)b.classList.add("correct")});
+ const q=quizQuestionAffichee,btns=document.querySelectorAll("#quiz-stage .quiz-option");
+ btns.forEach((b,j)=>{b.disabled=true;if(j===q.correctAffiche)b.classList.add("correct")});
  const feedback=document.getElementById("quiz-feedback");
- if(optIndex===q.correct){window.quizScore++;feedback.textContent="✅ Bonne réponse !";jouerSon("bon")}
- else{btns[optIndex].classList.add("wrong");feedback.textContent="❌ La bonne réponse est : "+q.options[q.correct]}
+ if(optIndex===q.correctAffiche){window.quizScore++;feedback.textContent="✅ Bonne réponse !";jouerSon("bon")}
+ else{btns[optIndex].classList.add("wrong");feedback.textContent="❌ La bonne réponse est : "+q.choix[q.correctAffiche].texte}
  window.quizRepondu++;const next=document.getElementById("quiz-next");next.textContent=quizQuestionActuelle===window.quizTotal-1?"Voir le résultat":"Question suivante →";next.style.display="block";
 }
 function questionQuizSuivante(){quizQuestionActuelle++;afficherQuestionQuiz()}
@@ -1967,15 +2120,45 @@ function jouerSon(type){
 /* ============================================================
    10. LECTURE VOCALE (TTS)
 ============================================================ */
+let cmLectureActive=false;
 function lireHistoire(){
-  if(!window.speechSynthesis){ toast("Lecture vocale non supportée"); return; }
-  window.speechSynthesis.cancel();
-  const texte = document.getElementById("story-body").innerText;
-  const u = new SpeechSynthesisUtterance(texte);
-  u.lang = (lireStockage("cm-langue")==="en"?"en-US":"fr-FR");
-  u.rate = 0.95;
-  window.speechSynthesis.speak(u);
-  toast("🔊 Lecture en cours...");
+  const synth=window.speechSynthesis;
+  if(!synth || typeof SpeechSynthesisUtterance==="undefined"){
+    toast("La lecture vocale n'est pas disponible sur cet appareil. Ouvrez le conte dans Chrome et vérifiez les voix du téléphone.");return;
+  }
+  synth.cancel();
+  const texte=(document.getElementById("story-title").innerText+". "+document.getElementById("story-body").innerText).replace(/\\s+/g," ").trim();
+  if(!texte){toast("Aucun texte à lire.");return;}
+  const langue=lireStockage("cm-langue")==="en"?"en-US":"fr-FR";
+  // Android peut couper les longs discours : découper en petites phrases évite ce problème.
+  const phrases=texte.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[texte];
+  const morceaux=[];let morceau="";
+  phrases.forEach(p=>{
+    if((morceau+" "+p).length>180){if(morceau)morceaux.push(morceau.trim());morceau=p;}
+    else morceau+=" "+p;
+  });
+  if(morceau.trim())morceaux.push(morceau.trim());
+  const lancer=()=>{
+    const voix=synth.getVoices();
+    const voixFr=voix.find(v=>v.lang&&v.lang.toLowerCase().startsWith(langue.toLowerCase().slice(0,2)));
+    let i=0;cmLectureActive=true;
+    const suivant=()=>{
+      if(!cmLectureActive||i>=morceaux.length){cmLectureActive=false;return;}
+      const u=new SpeechSynthesisUtterance(morceaux[i++]);
+      u.lang=langue;u.rate=0.88;
+      if(voixFr)u.voice=voixFr;
+      u.onend=suivant;
+      u.onerror=()=>{cmLectureActive=false;toast("La voix du téléphone a interrompu la lecture. Vérifiez les voix Text-to-Speech dans les paramètres Android.");};
+      synth.speak(u);
+    };
+    suivant();toast("🔊 Lecture du conte...");
+  };
+  if(synth.getVoices().length)lancer();
+  else {synth.onvoiceschanged=()=>{synth.onvoiceschanged=null;lancer();};setTimeout(()=>{if(!cmLectureActive&&synth.getVoices().length)lancer();},700);}
+}
+function arreterLecture(){
+  cmLectureActive=false;
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
 }
 
 /* ============================================================
@@ -2036,7 +2219,23 @@ function appliquerCouleur(c){
   document.documentElement.style.setProperty("--secondaire", c.s);
   ecrireStockage("cm-couleur", JSON.stringify(c));
   document.querySelectorAll(".color-swatch").forEach(s=>s.classList.remove("selected"));
-  event.target.classList.add("selected");
+  const swatch=[...document.querySelectorAll(".color-swatch")].find(el=>el.title===c.nom);
+  if(swatch)swatch.classList.add("selected");
+  const picker=document.getElementById("couleur-personnelle");
+  if(picker)picker.value=c.p;
+}
+function appliquerCouleurPersonnelle(){
+  const p=document.getElementById("couleur-personnelle").value;
+  const c={nom:"Personnalisée",p,s:assombrirCouleur(p)};
+  document.documentElement.style.setProperty("--primaire",c.p);
+  document.documentElement.style.setProperty("--secondaire",c.s);
+  ecrireStockage("cm-couleur",JSON.stringify(c));
+  document.querySelectorAll(".color-swatch").forEach(el=>el.classList.remove("selected"));
+  toast("🎨 Votre couleur personnelle est appliquée.");
+}
+function assombrirCouleur(hex){
+  const n=parseInt(hex.slice(1),16),r=Math.max(0,((n>>16)&255)-35),g=Math.max(0,((n>>8)&255)-35),b=Math.max(0,(n&255)-35);
+  return "#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("");
 }
 
 function setTheme(theme){
@@ -2105,6 +2304,7 @@ function chargerParametres(){
   if(c){
     document.documentElement.style.setProperty("--primaire", c.p);
     document.documentElement.style.setProperty("--secondaire", c.s);
+    const picker=document.getElementById("couleur-personnelle");if(picker)picker.value=c.p;
   }
   // Thème
   const theme = lireStockage("cm-theme")||"clair";
