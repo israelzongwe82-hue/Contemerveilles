@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConteMerveilles — par KIBWE ZONGWE Israël</title>
+<style>
+/* ==================== VARIABLES ==================== */
+:root{
+  --primaire:#667eea; --secondaire:#764ba2;
+  --fond:#fdfbfb; --fond-carte:#ffffff; --texte:#2c3e50;
+  --texte-doux:#555; --bordure:#e0e0e0;
+  --taille:16px; --largeur:1200px; --interligne:1.7;
+}
+[data-theme="sombre"]{
+  --fond:#12141c; --fond-carte:#1e2130; --texte:#e8ecf1;
+  --texte-doux:#a0a8b8; --bordure:#333a4d;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Georgia',serif;
+  background:var(--fond); color:var(--texte);
+  font-size:var(--taille); line-height:var(--interligne);
+  min-height:100vh; transition:background .4s,color .4s,font-size .3s;
+}
+
+/* ==================== INSCRIPTION ==================== */
+#inscription-screen{
+  position:fixed;inset:0;
+  background:linear-gradient(135deg,var(--primaire),var(--secondaire));
+  display:flex;justify-content:center;align-items:center;
+  z-index:1000;padding:1.5rem;
+}
+.inscription-box{
+  background:var(--fond-carte);border-radius:20px;padding:2.5rem;
+  max-width:450px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);
+  animation:fadeIn .6s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.inscription-box h1{text-align:center;font-size:2rem;margin-bottom:.4rem;color:var(--secondaire)}
+.subtitle{text-align:center;color:var(--texte-doux);font-style:italic;margin-bottom:1.8rem;font-size:.95rem}
+.inscription-box label{display:block;margin-bottom:.4rem;font-weight:bold;font-size:.95rem}
+.inscription-box input{
+  width:100%;padding:.8rem 1rem;margin-bottom:1.2rem;
+  border:2px solid var(--bordure);border-radius:10px;
+  font-size:1rem;font-family:inherit;background:var(--fond-carte);color:var(--texte);
+}
+.inscription-box input:focus{outline:none;border-color:var(--primaire)}
+.btn-primary{
+  width:100%;padding:.9rem;
+  background:linear-gradient(135deg,var(--primaire),var(--secondaire));
+  color:#fff;border:none;border-radius:10px;font-size:1.05rem;
+  font-weight:bold;cursor:pointer;font-family:inherit;transition:transform .2s;
+}
+.btn-primary:hover{transform:translateY(-2px)}
+
+/* ==================== APP ==================== */
+#app-screen{display:none}
+header{
+  background:linear-gradient(135deg,var(--primaire),var(--secondaire));
+  color:#fff;padding:2rem 1.5rem 1.6rem;text-align:center;
+  position:relative;box-shadow:0 4px 15px rgba(0,0,0,.1);
+}
+header h1{font-size:2rem;margin-bottom:.3rem;text-shadow:2px 2px 4px rgba(0,0,0,.3)}
+header p{font-size:.95rem;font-style:italic;opacity:.95}
+.top-bar{position:absolute;top:.8rem;right:1rem;display:flex;gap:.4rem;flex-wrap:wrap;justify-content:flex-end}
+.top-bar button{
+  background:rgba(255,255,255,.25);color:#fff;border:none;
+  padding:.4rem .8rem;border-radius:20px;cursor:pointer;
+  font-size:.8rem;font-family:inherit;transition:background .3s;
+}
+.top-bar button:hover{background:rgba(255,255,255,.45)}
+
+.container{max-width:var(--largeur);margin:0 auto;padding:2rem 1.5rem}
+.intro{text-align:center;margin-bottom:2rem;color:var(--texte-doux)}
+.intro strong{color:var(--secondaire)}
+
+.categories{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.3rem}
+.category-card{
+  background:var(--fond-carte);border-radius:15px;padding:1.6rem 1.3rem;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);cursor:pointer;
+  transition:transform .3s,box-shadow .3s;border-top:5px solid var(--primaire);
+}
+.category-card:hover{transform:translateY(-8px);box-shadow:0 12px 30px rgba(0,0,0,.15)}
+.category-card .icon{font-size:2.6rem;display:block;margin-bottom:.6rem}
+.category-card h2{font-size:1.15rem;margin-bottom:.3rem}
+.category-card p{font-size:.85rem;color:var(--texte-doux)}
+.category-card .count{display:inline-block;margin-top:.5rem;font-size:.75rem;background:var(--primaire);color:#fff;padding:.15rem .6rem;border-radius:20px}
+
+.aventure{border-top-color:#e74c3c} .foret{border-top-color:#27ae60}
+.ville{border-top-color:#3498db} .village{border-top-color:#f39c12}
+.marin{border-top-color:#1abc9c} .drole{border-top-color:#9b59b6}
+.sorcier{border-top-color:#8e44ad} .famille{border-top-color:#e91e63}
+.drole .icon{animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ==================== MODAL ==================== */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:500;justify-content:center;align-items:center;padding:1rem;
+}
+ .modal-overlay.active{display:flex}
+/* La sélection des contes occupe désormais tout l'écran. */
+#list-modal{padding:0;align-items:stretch;justify-content:stretch;background:var(--fond);}
+#list-modal .modal-content{width:100%;max-width:none;height:100%;max-height:none;border-radius:0;padding:1.2rem;overflow-y:auto;box-shadow:none;animation:fadeIn .25s ease;}
+#list-modal .list-header{display:flex;align-items:center;gap:1rem;position:sticky;top:-1.2rem;background:var(--fond-carte);padding:.6rem 0 1rem;z-index:2;border-bottom:1px solid var(--bordure);margin-bottom:1rem;}
+#list-modal .list-header h2{flex:1;margin:0;}
+.btn-retour{border:0;border-radius:12px;padding:.65rem 1rem;background:var(--primaire);color:#fff;font:inherit;font-weight:bold;cursor:pointer;white-space:nowrap;}
+#list-modal .conte-list{padding-bottom:2rem;}
+/* La lecture d'un conte occupe tout l'écran, sans petite fenêtre centrée. */
+#story-modal{padding:0;align-items:stretch;justify-content:stretch;background:var(--fond);}
+#story-modal .modal-content{width:100%;max-width:none;height:100%;max-height:none;border-radius:0;padding:1rem;overflow-y:auto;box-shadow:none;animation:fadeIn .25s ease;}
+#story-modal .btn-retour{position:sticky;top:0;z-index:3;width:44px;height:44px;padding:0;border-radius:50%;font-size:1.7rem;display:inline-flex;align-items:center;justify-content:center;}
+#story-modal .illustration{max-height:180px;}
+#story-modal .modal-actions{padding-bottom:1.5rem;}
+@media(max-width:600px){#story-modal .modal-content{padding:1rem;}#story-modal #story-title{font-size:1.3rem;}}
+@media(max-width:600px){#list-modal .modal-content{padding:1rem;}#list-modal .list-header{top:-1rem;gap:.6rem;}#list-modal .list-header h2{font-size:1.15rem;}}
+.modal-content{
+  background:var(--fond-carte);border-radius:20px;max-width:820px;width:100%;
+  max-height:90vh;overflow-y:auto;padding:2rem;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);animation:fadeIn .4s ease;
+}
+.modal-content h2{color:var(--secondaire);margin-bottom:1rem;font-size:1.5rem;border-bottom:2px solid var(--bordure);padding-bottom:.5rem}
+.modal-content .close-x{
+  float:right;background:none;border:none;font-size:1.6rem;
+  cursor:pointer;color:var(--texte);line-height:1;
+}
+.story-text{font-size:1rem;line-height:var(--interligne);text-align:justify;color:var(--texte)}
+.story-text p{margin-bottom:1rem}
+
+.illustration{width:100%;max-height:180px;margin-bottom:1rem;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,var(--primaire),var(--secondaire));display:flex;justify-content:center;align-items:center}
+.illustration svg{height:160px;width:auto}
+
+.modal-actions{display:flex;gap:.6rem;margin-top:1.5rem;flex-wrap:wrap}
+.modal-actions button{
+  padding:.65rem 1.2rem;border:none;border-radius:10px;
+  font-size:.9rem;cursor:pointer;font-family:inherit;transition:background .3s;
+}
+.btn-close{background:var(--secondaire);color:#fff}
+.btn-close:hover{background:#5a3a7a}
+.btn-quiz{background:#f39c12;color:#fff}
+.btn-quiz:hover{background:#d68910}
+.btn-fav{background:#e91e63;color:#fff}
+.btn-fav:hover{background:#ad1457}
+.btn-export{background:#27ae60;color:#fff}
+.btn-export:hover{background:#1e8449}
+.btn-tts{background:#3498db;color:#fff}
+.btn-tts:hover{background:#2874a6}
+
+/* ==================== QUIZ ==================== */
+#quiz-modal{display:none;position:fixed;inset:0;z-index:900;background:var(--fond);color:var(--texte);padding:1rem;overflow-y:auto}
+#quiz-modal.active{display:block}
+#quiz-modal .quiz-top{display:flex;align-items:center;gap:1rem;max-width:760px;margin:0 auto 2rem}
+#quiz-modal .quiz-top h2{flex:1;margin:0;color:var(--secondaire)}
+#quiz-modal .quiz-stage{max-width:760px;margin:0 auto}
+#quiz-modal .quiz-box{margin:0;padding:1.5rem;background:var(--fond-carte)}
+#quiz-modal .quiz-question p{font-size:1.15rem;line-height:1.6}
+#quiz-modal .quiz-option{padding:1rem;font-size:1rem}
+#quiz-modal .quiz-next{display:block;width:100%;margin-top:1rem;padding:.9rem;border:0;border-radius:10px;background:var(--primaire);color:white;font:inherit;font-weight:bold}
+#quiz-modal .quiz-progress{margin-bottom:1rem;color:var(--texte-doux)}
+.quiz-box{margin-top:1.2rem;padding:1.2rem;background:rgba(102,126,234,.1);border-radius:12px;border:1px solid var(--primaire)}
+.quiz-box h3{color:var(--secondaire);margin-bottom:.8rem}
+.quiz-question{margin-bottom:1rem}
+.quiz-question p{font-weight:bold;margin-bottom:.5rem;font-size:.95rem}
+.quiz-option{
+  display:block;width:100%;text-align:left;
+  padding:.55rem .9rem;margin:.3rem 0;
+  background:var(--fond-carte);border:2px solid var(--bordure);border-radius:8px;
+  cursor:pointer;font-family:inherit;font-size:.9rem;color:var(--texte);
+  transition:all .2s;
+}
+.quiz-option:hover{border-color:var(--primaire)}
+.quiz-option.correct{background:#d4edda;border-color:#27ae60;color:#155724}
+.quiz-option.wrong{background:#f8d7da;border-color:#e74c3c;color:#721c24}
+.quiz-result{margin-top:.8rem;font-weight:bold;text-align:center;color:var(--secondaire)}
+
+/* ==================== LISTE CONTES ==================== */
+.conte-list{display:grid;gap:.7rem;margin-top:1rem}
+.conte-item{
+  background:var(--fond-carte);border:2px solid var(--bordure);border-radius:12px;
+  padding:1rem 1.2rem;cursor:pointer;transition:all .2s;
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;
+}
+.conte-item:hover{border-color:var(--primaire);transform:translateX(4px)}
+.conte-item .titre{font-weight:bold;font-size:.95rem}
+.conte-item .badge{font-size:.75rem;padding:.15rem .5rem;border-radius:20px;background:var(--primaire);color:#fff;white-space:nowrap}
+
+/* ==================== PARAMÈTRES ==================== */
+.settings-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:800;justify-content:center;align-items:center;padding:1rem;
+}
+.settings-overlay.active{display:flex}
+.settings-box{
+  background:var(--fond-carte);border-radius:20px;padding:2rem;
+  max-width:560px;width:100%;max-height:90vh;overflow-y:auto;
+  color:var(--texte);
+}
+.settings-box h2{color:var(--secondaire);margin-bottom:1.2rem;text-align:center}
+.settings-group{margin-bottom:1.5rem;padding-bottom:1.2rem;border-bottom:1px solid var(--bordure)}
+.settings-group h3{font-size:.95rem;margin-bottom:.6rem;color:var(--texte-doux)}
+.color-picker{display:flex;gap:.6rem;flex-wrap:wrap}
+.color-swatch{width:36px;height:36px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .2s}
+.color-swatch:hover{transform:scale(1.1)}
+.slider-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.7rem}
+.slider-row label{flex:0 0 110px;font-size:.85rem}
+.slider-row input[type=range]{flex:1}
+.slider-row span{width:55px;text-align:right;font-size:.8rem;color:var(--texte-doux)}
+
+.theme-btns{display:flex;gap:.5rem;flex-wrap:wrap}
+.theme-btns button{
+  flex:1;padding:.6rem;border:2px solid var(--bordure);background:var(--fond-carte);
+  color:var(--texte);border-radius:10px;cursor:pointer;font-family:inherit;font-size:.9rem;
+  transition:all .2s;
+}
+.theme-btns button.active{border-color:var(--primaire);background:var(--primaire);color:#fff}
+
+/* ==================== PROGRESSION ==================== */
+.progress-bar{width:100%;height:10px;background:var(--bordure);border-radius:10px;overflow:hidden;margin-top:.5rem}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primaire),var(--secondaire));width:0%;transition:width .5s}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.8rem;margin-top:.8rem}
+.stat-card{background:rgba(102,126,234,.1);padding:.8rem;border-radius:10px;text-align:center}
+.stat-card .num{font-size:1.5rem;font-weight:bold;color:var(--secondaire)}
+.stat-card .lbl{font-size:.75rem;color:var(--texte-doux)}
+
+footer{
+  background:#2c3e50;color:#ecf0f1;text-align:center;
+  padding:1.5rem 1rem;margin-top:2rem;font-size:.85rem;
+}
+footer .creator{color:#f1c40f;font-weight:bold}
+
+/* ==================== TOAST ==================== */
+.toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--secondaire);color:#fff;padding:.8rem 1.5rem;
+  border-radius:30px;font-size:.9rem;z-index:2000;
+  transition:transform .4s;box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:600px){
+  header h1{font-size:1.6rem}
+  .top-bar{position:static;justify-content:center;margin-top:.8rem}
+  .modal-content{padding:1.3rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== INSCRIPTION ==================== -->
+<div id="inscription-screen">
+  <div class="inscription-box">
+    <h1>✨ ConteMerveilles ✨</h1>
+    <p class="subtitle">Avant de commencer, dites-nous qui vous êtes...</p>
+    <form id="inscription-form">
+      <label for="nom">Votre prénom / nom</label>
+      <input type="text" id="nom" placeholder="Ex : Amina, Koffi, Léa..." required>
+      <label for="date-naissance">Votre date de naissance</label>
+      <input type="date" id="date-naissance" required>
+      <button type="submit" class="btn-primary">Entrer dans les contes 🌟</button>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div id="app-screen">
+  <header>
+    <div class="top-bar">
+      <button onclick="ouvrirParametres()">⚙️ Paramètres</button>
+      <button onclick="ouvrirFavoris()">⭐ Mes favoris</button>
+      <button onclick="ouvrirProgression()">📊 Progression</button>
+      <button onclick="changerProfil()">👤 Profil</button>
+    </div>
+    <h1>✨ ConteMerveilles ✨</h1>
+    <p>Un voyage à travers les mondes de l'imaginaire</p>
+  </header>
+
+  <main class="container">
+    <p class="intro">Choisissez votre univers, <strong id="intro-nom">cher voyageur</strong>, et laissez la magie opérer...</p>
+    <section class="categories" id="categories"></section>
+  </main>
+
+  <footer>
+    <p>© 2026 ConteMerveilles — Créé par <span class="creator">KIBWE ZONGWE Israël</span></p>
+  </footer>
+</div>
+
+<!-- ==================== MODAL CONTES (liste) ==================== -->
+<div class="modal-overlay" id="list-modal">
+  <div class="modal-content">
+    <div class="list-header">
+      <button class="btn-retour" aria-label="Retour" title="Retour" onclick="fermerListe()">←</button>
+      <h2 id="list-title"></h2>
+    </div>
+    <div class="conte-list" id="conte-list"></div>
+  </div>
+</div>
+
+<!-- ==================== MODAL HISTOIRE ==================== -->
+<div class="modal-overlay" id="story-modal">
+  <div class="modal-content">
+    <button class="btn-retour" aria-label="Retour aux contes" title="Retour aux contes" onclick="retourDepuisConte()">←</button>
+    <div class="illustration" id="story-illustration"></div>
+    <h2 id="story-title"></h2>
+    <div class="story-text" id="story-body"></div>
+    <div id="quiz-container"></div>
+    <div class="modal-actions">
+      <button class="btn-close" onclick="closeStory()">Fermer</button>
+      <button class="btn-quiz" id="btn-quiz" onclick="lancerQuiz()">🎯 Jouer au quiz</button>
+      <button class="btn-fav" id="btn-fav" onclick="toggleFavori()">⭐ Favori</button>
+      <button class="btn-export" onclick="exporterPDF()">📄 PDF</button>
+      <button class="btn-export" onclick="exporterWord()">📝 Word</button>
+      <button class="btn-tts" onclick="lireHistoire()">🔊 Écouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== QUIZ PLEIN ÉCRAN ==================== -->
+<div id="quiz-modal" aria-live="polite">
+  <div class="quiz-top"><button class="btn-retour" aria-label="Retour" title="Retour" onclick="fermerQuiz()">←</button><h2>🎯 Quiz</h2></div>
+  <div class="quiz-stage" id="quiz-stage"></div>
+</div>
+<!-- ==================== PARAMÈTRES ==================== -->
+<div class="settings-overlay" id="settings-modal">
+  <div class="settings-box">
+    <h2>⚙️ Paramètres</h2>
+
+    <div class="settings-group">
+      <h3>🌓 Thème</h3>
+      <div class="theme-btns">
+        <button data-theme="clair" onclick="setTheme('clair')">☀️ Clair</button>
+        <button data-theme="sombre" onclick="setTheme('sombre')">🌙 Sombre</button>
+        <button data-theme="auto" onclick="setTheme('auto')">🔄 Automatique</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3>🎨 Couleur principale</h3>
+      <div class="color-picker" id="couleur-picker"></div>
+    </div>
+
+    <div class="settings-group">
+      <h3>🔤 Taille du texte</h3>
+      <div class="slider-row">
+        <label>Taille</label>
+        <input type="range" id="slider-taille" min="12" max="24" value="16">
+        <span id="valeur-taille">16px</span>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3>📏 Largeur de l'application</h3>
+      <div class="slider-row">
+        <label>Largeur</label>
+        <input type="range" id="slider-largeur" min="700" max="1600" value="1200" step="50">
+        <span id="valeur-largeur">1200px</span>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3>📐 Interligne (hauteur des lignes)</h3>
+      <div class="slider-row">
+        <label>Interligne</label>
+        <input type="range" id="slider-interligne" min="12" max="24" value="17">
+        <span id="valeur-interligne">1.7</span>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="fermerParametres()">Fermer</button>
+  </div>
+</div>
+
+<!-- ==================== FAVORIS ==================== -->
+<div class="modal-overlay" id="fav-modal">
+  <div class="modal-content">
+    <button class="close-x" onclick="document.getElementById('fav-modal').classList.remove('active')">×</button>
+    <h2>⭐ Mes contes préférés</h2>
+    <div class="conte-list" id="fav-list"></div>
+  </div>
+</div>
+
+<!-- ==================== PROGRESSION ==================== -->
+<div class="modal-overlay" id="prog-modal">
+  <div class="modal-content">
+    <button class="close-x" onclick="document.getElementById('prog-modal').classList.remove('active')">×</button>
+    <h2>📊 Ma progression</h2>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num" id="stat-lus">0</div><div class="lbl">Contes lus</div></div>
+      <div class="stat-card"><div class="num" id="stat-quiz">0</div><div class="lbl">Quiz réussis</div></div>
+      <div class="stat-card"><div class="num" id="stat-score">0</div><div class="lbl">Score total</div></div>
+      <div class="stat-card"><div class="num" id="stat-fav">0</div><div class="lbl">Favoris</div></div>
+    </div>
+    <h3 style="margin-top:1.5rem;color:var(--secondaire)">Progression globale</h3>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    <p style="margin-top:.5rem;font-size:.85rem;color:var(--texte-doux)" id="prog-text">0 / 160 contes lus</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   1. UTILISATEUR
+============================================================ */
+let utilisateur = { nom:"", age:0, dateNaissance:"" };
+
+function calculerAge(d){
+  const n=new Date(d), a=new Date();
+  let age=a.getFullYear()-n.getFullYear();
+  const m=a.getMonth()-n.getMonth();
+  if(m<0||(m===0&&a.getDate()<n.getDate())) age--;
+  return age;
+}
+
+function lireStockage(cle){
+  try { return localStorage.getItem(cle); }
+  catch(err) {
+    try { return sessionStorage.getItem(cle); }
+    catch(err2) { return null; }
+  }
+}
+
+function ecrireStockage(cle, valeur){
+  try {
+    localStorage.setItem(cle, valeur);
+    return true;
+  } catch(err) {
+    try {
+      sessionStorage.setItem(cle, valeur);
+      return true;
+    } catch(err2) {
+      return false;
+    }
+  }
+}
+
+function supprimerStockage(cle){
+  try { localStorage.removeItem(cle); } catch(err) {}
+  try { sessionStorage.removeItem(cle); } catch(err) {}
+}
+
+function chargerUtilisateur(){
+  const d = lireStockage("cm-user");
+  if(!d) return false;
+  try {
+    const u = JSON.parse(d);
+    if(u && typeof u.nom === "string" && u.nom.trim() && u.dateNaissance){
+      utilisateur = {
+        nom: u.nom.trim(),
+        dateNaissance: u.dateNaissance,
+        age: Number.isFinite(Number(u.age)) ? Number(u.age) : calculerAge(u.dateNaissance)
+      };
+      return true;
+    }
+  } catch(err) {
+    supprimerStockage("cm-user");
+  }
+  return false;
+}
+
+document.getElementById("inscription-form").addEventListener("submit", e=>{
+  e.preventDefault();
+  const nom = document.getElementById("nom").value.trim();
+  const date = document.getElementById("date-naissance").value;
+
+  if(!nom || !date){
+    toast("Veuillez remplir les deux champs.");
+    return;
+  }
+
+  // Empêche une date future ou invalide.
+  const dateChoisie = new Date(date + "T00:00:00");
+  const aujourdHui = new Date();
+  aujourdHui.setHours(0,0,0,0);
+  if(Number.isNaN(dateChoisie.getTime()) || dateChoisie > aujourdHui){
+    toast("Veuillez choisir une date de naissance valide.");
+    return;
+  }
+
+  utilisateur = {nom, dateNaissance:date, age:calculerAge(date)};
+  ecrireStockage("cm-user", JSON.stringify(utilisateur));
+
+  // L'application doit s'ouvrir même si le navigateur bloque le stockage.
+  lancerApplication();
+});
+
+function lancerApplication(){
+  document.getElementById("inscription-screen").style.display="none";
+  document.getElementById("app-screen").style.display="block";
+  document.getElementById("intro-nom").textContent=utilisateur.nom;
+  chargerParametres();
+  chargerProgression();
+  renderCategories();
+}
+
+function changerProfil(){
+  if(confirm("Changer de profil ? Vous devrez vous réinscrire.")){
+    supprimerStockage("cm-user");
+    location.reload();
+  }
+}
+
+/* ============================================================
+   2. CONTES — 20 par catégorie (8 catégories × 20 = 160)
+   Chaque conte : { titre, illustration, texte, quiz[] }
+============================================================ */
+
+/* Génère les 20 contes d'une catégorie à partir d'un modèle */
+function genererContes(categorie){
+  const modeles = MODELES[categorie];
+  return modeles;
+}
+
+/* Icônes SVG réutilisables */
+const SVG = {
+  aventure:`<svg viewBox="0 0 200 160"><path d="M20 140 L80 60 L110 100 L140 50 L180 140 Z" fill="#fff" opacity=".8"/><circle cx="160" cy="30" r="12" fill="#ffd93d"/></svg>`,
+  foret:`<svg viewBox="0 0 200 160"><polygon points="40,140 60,80 80,140" fill="#2ecc71"/><polygon points="90,140 120,60 150,140" fill="#27ae60"/><rect x="35" y="140" width="8" height="15" fill="#8b4513"/><rect x="115" y="140" width="8" height="15" fill="#8b4513"/></svg>`,
+  ville:`<svg viewBox="0 0 200 160"><rect x="30" y="60" width="30" height="90" fill="#3498db"/><rect x="70" y="40" width="40" height="110" fill="#2980b9"/><rect x="120" y="70" width="35" height="80" fill="#1f618d"/><circle cx="45" cy="75" r="3" fill="#fff"/><circle cx="85" cy="60" r="3" fill="#fff"/><circle cx="135" cy="85" r="3" fill="#fff"/></svg>`,
+  village:`<svg viewBox="0 0 200 160"><rect x="50" y="80" width="60" height="60" fill="#f39c12"/><polygon points="45,80 80,40 115,80" fill="#e67e22"/><rect x="70" y="105" width="20" height="35" fill="#8b4513"/><circle cx="145" cy="60" r="15" fill="#ffd93d"/></svg>`,
+  marin:`<svg viewBox="0 0 200 160"><path d="M20 120 Q60 100 100 120 T180 120" stroke="#1abc9c" stroke-width="4" fill="none"/><path d="M20 140 Q60 120 100 140 T180 140" stroke="#16a085" stroke-width="3" fill="none"/><polygon points="100,20 100,110 60,110" fill="#fff"/><rect x="98" y="20" width="4" height="90" fill="#8b4513"/></svg>`,
+  drole:`<svg viewBox="0 0 200 160"><circle cx="100" cy="80" r="60" fill="#ffd93d"/><circle cx="80" cy="65" r="8" fill="#333"/><circle cx="120" cy="65" r="8" fill="#333"/><path d="M70 100 Q100 130 130 100" stroke="#333" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`,
+  sorcier:`<svg viewBox="0 0 200 160"><polygon points="100,20 60,100 140,100" fill="#8e44ad"/><rect x="55" y="100" width="90" height="15" fill="#6c3483"/><circle cx="100" cy="50" r="6" fill="#ffd93d"/><circle cx="80" cy="75" r="4" fill="#fff"/><circle cx="120" cy="75" r="4" fill="#fff"/></svg>`,
+  famille:`<svg viewBox="0 0 200 160"><circle cx="70" cy="50" r="15" fill="#e91e63"/><circle cx="130" cy="50" r="15" fill="#e91e63"/><path d="M55 75 Q70 90 70 110 M145 75 Q130 90 130 110" stroke="#e91e63" stroke-width="6" fill="none"/><path d="M70 90 L70 110 M130 90 L130 110" stroke="#e91e63" stroke-width="6"/><rect x="88" y="70" width="24" height="60" rx="12" fill="#f06292"/></svg>`
+};
+
+/* ============================================================
+   MODÈLES DE CONTES (20 par catégorie = 160 contes)
+   Chaque conte = { titre, texte, quiz[] }
+   L'utilisateur doit lire AU MOINS un quiz pour débloquer le suivant.
+============================================================ */
+
+const C = (titre, texte, quiz) => ({titre, texte, quiz});
+
+/* ---------- AVENTURE (20) ---------- */
+const MODELES = {};
+
+MODELES.aventure = [
+C("Le Trésor de la Montagne de Cristal", `
+<p>Au sommet d'une montagne où le cristal pousse comme l'herbe, un trésor attend celui qui osera braver la peur.</p>
+<p>{nom} partit avant l'aube, une vieille boussole à la main. Sur la carte, une phrase : « Celui qui cherche avec le cœur trouvera plus qu'il n'espère. »</p>
+<p>Un vieux sage offrit un conseil : « Ne regarde jamais en arrière quand la montagne t'appelle. » Un enfant perdu montra un passage secret, et {nom} promit de le ramener chez lui.</p>
+<p>Au sommet, dans une grotte bleue, un coffre attendait. À l'intérieur : un simple miroir. Une voix murmura : « Le vrai trésor, c'est toi — ton courage et ta promesse tenue. »</p>
+<p>Redescendu, {nom} ramena l'enfant chez ses parents. Une fête fut organisée. Et depuis, la montagne ne brille plus pour l'or, mais pour ceux qui cherchent avec le cœur.</p>`,
+[{q:"Que trouve {nom} dans le coffre ?",options:["De l'or","Un miroir","Une épée","Un livre"],correct:1},
+ {q:"Qui montre le passage secret ?",options:["Un vieux sage","Un enfant perdu","Un dragon","Un roi"],correct:1},
+ {q:"Quelle est la morale ?",options:["L'or rend heureux","Le courage et la bonté sont les vrais trésors","Il faut voler","Il faut dormir"],correct:1}]),
+
+C("L'Épée des Trois Vents", `
+<p>Trois vents gardaient une épée magique dans un temple oublié. Nul ne savait pourquoi elle était là. {nom} décida de le découvrir.</p>
+<p>Le premier vent, glacé, souffla si fort qu'il fallut s'accrocher aux rochers. Le deuxième, brûlant, fit fondre les pierres. Le troisième, silencieux, posa une seule question : « Pourquoi veux-tu cette épée ? »</p>
+<p>{nom} répondit : « Pour protéger mon village. » Le vent sourit, et l'épée apparut. Elle n'était pas faite pour tuer, mais pour trancher les malentendus.</p>
+<p>Depuis, {nom} règne en paix — non par la force, mais par la parole.</p>`,
+[{q:"Combien de vents gardent l'épée ?",options:["Un","Deux","Trois","Quatre"],correct:2},
+ {q:"Pourquoi {nom} veut l'épée ?",options:["Pour se battre","Pour protéger son village","Pour la vendre","Pour la cacher"],correct:1}]),
+
+C("La Carte du Bout du Monde", `
+<p>Un vieux capitaine avait laissé une carte : au bout du monde, disait-il, il y a une porte. {nom} partit la chercher.</p>
+<p>Traversant déserts et océans, {nom} rencontra un oiseau qui parlait. « La porte est en toi », dit l'oiseau. {nom} rit, crut à une blague, continua.</p>
+<p>Au bout du monde, il n'y avait... rien. Juste un miroir posé sur un rocher. {nom} comprit : la porte, c'était le courage de partir.</p>
+<p>Il rentra chez lui, changé pour toujours.</p>`,
+[{q:"Qui parle à {nom} en chemin ?",options:["Un poisson","Un oiseau","Un roi","Un fantôme"],correct:1},
+ {q:"Que trouve {nom} au bout du monde ?",options:["Un trésor","Un miroir","Une porte en or","Rien du tout"],correct:1}]),
+
+C("Le Dragon qui Avait Peur du Noir", `
+<p>Un dragon terrifiait un royaume... mais en vérité, il avait peur du noir. {nom} le découvrit par hasard.</p>
+<p>Au lieu de le combattre, {nom} lui offrit une lanterne. Le dragon, rassuré, devint le gardien du village.</p>
+<p>Depuis, chaque nuit, on voit une lumière douce au-dessus des toits : c'est le dragon qui veille.</p>`,
+[{q:"De quoi le dragon a-t-il peur ?",options:["De l'eau","Du noir","Des enfants","Du feu"],correct:1},
+ {q:"Que lui offre {nom} ?",options:["Une épée","Une lanterne","Un gâteau","Un livre"],correct:1}]),
+
+C("Les Trois Épreuves du Roi", `
+<p>Le roi promit son royaume à qui passerait trois épreuves : courir plus vite que le vent, porter une plume sans la casser, et faire rire un sage.</p>
+<p>{nom} réussit les deux premières... mais la troisième semblait impossible. Alors {nom} raconta une histoire si drôle que le sage tomba de sa chaise.</p>
+<p>Le roi, hilare, tint sa promesse. Et {nom} devint le plus jeune souverain du pays.</p>`,
+[{q:"Combien d'épreuves ?",options:["Deux","Trois","Quatre","Cinq"],correct:1},
+ {q:"Comment {nom} fait rire le sage ?",options:["En chantant","En racontant une histoire drôle","En dansant","En criant"],correct:1}]),
+
+C("Le Chevalier sans Armure", `
+<p>On disait qu'aucun chevalier ne pouvait vaincre le géant. Mais {nom} n'avait pas d'armure — juste un grand cœur.</p>
+<p>Face au géant, {nom} posa son épée et dit : « Pourquoi te bats-tu ? » Le géant, surpris, avoua qu'il était seul. {nom} lui tendit la main.</p>
+<p>Le géant devint son ami, et ensemble ils protégèrent le royaume.</p>`,
+[{q:"Que porte {nom} ?",options:["Une armure","Aucune armure","Un bouclier","Un casque"],correct:1},
+ {q:"Que devient le géant ?",options:["Un ennemi","Un ami","Un roi","Un fantôme"],correct:1}]),
+
+C("La Boussole qui Ne Savait pas Mentir", `
+<p>Une boussole magique indiquait non pas le nord, mais la vérité. {nom} la trouva dans une vieille malle.</p>
+<p>Elle pointait vers les mensonges des autres. Un jour, {nom} se demanda : « Et moi ? » La boussole trembla... puis pointa vers son propre cœur.</p>
+<p>{nom} comprit qu'il fallait d'abord être honnête avec soi-même.</p>`,
+[{q:"Que montre la boussole ?",options:["Le nord","La vérité","L'avenir","Le trésor"],correct:1},
+ {q:"Vers quoi pointe-t-elle à la fin ?",options:["Un château","Le cœur de {nom}","La mer","Un dragon"],correct:1}]),
+
+C("L'Île aux Échos", `
+<p>Sur une île, chaque mot prononcé revenait en écho. {nom} y débarqua et cria : « Je suis perdu ! » L'île répondit : « Perdu... perdu... »</p>
+<p>Alors {nom} murmura : « Je vais trouver mon chemin. » L'île répéta : « Chemin... chemin... » Et un sentier apparut.</p>
+<p>Depuis, {nom} sait que les mots ont un pouvoir.</p>`,
+[{q:"Que fait l'île ?",options:["Elle dort","Elle répète les mots","Elle mange","Elle chante"],correct:1},
+ {q:"Comment {nom} trouve son chemin ?",options:["En criant","En murmurant une phrase positive","En courant","En pleurant"],correct:1}]),
+
+C("Le Pont des Nuages", `
+<p>Un pont invisible reliait deux montagnes. Seuls ceux au cœur pur pouvaient le voir. {nom} le vit en fermant les yeux.</p>
+<p>Traversant le pont, {nom} trouva un village endormi. Un sort l'avait plongé dans le sommeil. Il suffisait de chanter pour le réveiller.</p>
+<p>{nom} chanta. Le village s'éveilla. Depuis, on l'appelle « Celui qui chante ».</p>`,
+[{q:"Qui peut voir le pont ?",options:["Les riches","Les cœurs purs","Les rois","Les dragons"],correct:1},
+ {q:"Comment réveiller le village ?",options:["En criant","En chantant","En courant","En frappant"],correct:1}]),
+
+C("Le Grimoire des Oubliés", `
+<p>Un livre contenait les noms de tous ceux qu'on avait oubliés. {nom} le trouva dans une bibliothèque poussiéreuse.</p>
+<p>En le lisant, {nom} décida de retrouver chaque personne. Des mois de voyage, des rencontres touchantes. À la fin, le livre se vida.</p>
+<p>Et {nom} comprit : se souvenir, c'est déjà aimer.</p>`,
+[{q:"Que contient le grimoire ?",options:["Des sorts","Des noms oubliés","Des cartes","Des poèmes"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il brûle le livre","Il retrouve les personnes","Il le cache","Il le vend"],correct:1}]),
+
+C("Le Désert qui Chantait", `
+<p>Au milieu du désert, une dune chantait chaque nuit. {nom} partit l'écouter.</p>
+<p>La dune raconta l'histoire d'un roi qui avait tout perdu pour l'orgueil. {nom} comprit que l'humilité valait mieux que l'or.</p>
+<p>Il rentra chez lui changé, plus sage qu'avant.</p>`,
+[{q:"Qui chante ?",options:["Une dune","Un oiseau","Un roi","Un chameau"],correct:0},
+ {q:"Quelle leçon {nom} apprend-il ?",options:["L'orgueil","L'humilité","La richesse","La force"],correct:1}]),
+
+C("Le Secret de la Tour sans Porte", `
+<p>Une tour sans porte trônait au milieu du lac. {nom} plongea et trouva une entrée sous l'eau.</p>
+<p>À l'intérieur : une chambre remplie de lettres jamais envoyées. {nom} décida de les livrer.</p>
+<p>Chaque lettre changea une vie. Et {nom} devint le messager du lac.</p>`,
+[{q:"Où est l'entrée de la tour ?",options:["Au sommet","Sous l'eau","Dans la forêt","Derrière un arbre"],correct:1},
+ {q:"Que trouve {nom} dans la tour ?",options:["De l'or","Des lettres","Un trésor","Un dragon"],correct:1}]),
+
+C("Le Chemin des Lucioles", `
+<p>Un soir, {nom} suivit des lucioles dans la forêt. Elles le menèrent à une clairière où dansait une fée.</p>
+<p>« Tu as suivi la lumière, dit la fée. Maintenant, suis ton cœur. » {nom} comprit qu'il devait aider son village.</p>
+<p>De retour, il organisa une fête pour tous les enfants.</p>`,
+[{q:"Qui danse dans la clairière ?",options:["Un roi","Une fée","Un ours","Un dragon"],correct:1},
+ {q:"Que conseille la fée ?",options:["Suivre la lumière","Suivre son cœur","Dormir","Manger"],correct:1}]),
+
+C("L'Étoile Filante", `
+<p>{nom} vit une étoile tomber dans la mer. Il plongea pour la retrouver.</p>
+<p>Au fond, une petite étoile pleurait. Elle voulait rentrer au ciel. {nom} la porta jusqu'à la plus haute montagne et la lança.</p>
+<p>Depuis, chaque nuit, l'étoile brille plus fort pour lui.</p>`,
+[{q:"Où tombe l'étoile ?",options:["Dans la forêt","Dans la mer","Dans la ville","Dans le désert"],correct:1},
+ {q:"Où {nom} la lance-t-il ?",options:["Dans la rivière","Depuis la plus haute montagne","Dans un puits","Dans un arbre"],correct:1}]),
+
+C("Le Miroir des Trois Lunes", `
+<p>Un miroir ne reflétait que sous trois lunes. {nom} attendit la bonne nuit.</p>
+<p>Dans le miroir apparut son avenir : un roi sage, aimé de tous. Mais le miroir ajouta : « Rien n'est écrit. »</p>
+<p>{nom} décida d'écrire lui-même son histoire.</p>`,
+[{q:"Combien de lunes faut-il ?",options:["Une","Deux","Trois","Quatre"],correct:2},
+ {q:"Que montre le miroir ?",options:["Le passé","Un avenir possible","Le présent","La mort"],correct:1}]),
+
+C("Le Géant Jardinier", `
+<p>Un géant cultivait des fleurs immenses. {nom} entra dans son jardin.</p>
+<p>Le géant offrit une graine magique. « Plante-la dans ton village. » {nom} obéit. Un arbre gigantesque poussa, offrant fruits et ombre.</p>
+<p>Depuis, personne ne se moque plus des géants.</p>`,
+[{q:"Que cultive le géant ?",options:["Des arbres","Des fleurs","Des légumes","Des maisons"],correct:1},
+ {q:"Que devient la graine ?",options:["Une fleur","Un arbre géant","Un fruit","Un rocher"],correct:1}]),
+
+C("Le Fleuve qui Remontait", `
+<p>Un fleuve coulait à l'envers. {nom} décida de comprendre pourquoi.</p>
+<p>À la source, une sirène retenait l'eau par tristesse. {nom} lui raconta une histoire drôle. La sirène rit, l'eau repartit.</p>
+<p>Depuis, le fleuve chante.</p>`,
+[{q:"Que fait le fleuve ?",options:["Il sèche","Il coule à l'envers","Il gèle","Il disparaît"],correct:1},
+ {q:"Comment {nom} débloque l'eau ?",options:["En criant","En racontant une histoire drôle","En pleurant","En chantant"],correct:1}]),
+
+C("Le Château de Verre", `
+<p>Un château de verre apparaissait chaque cent ans. {nom} y entra.</p>
+<p>À l'intérieur, des souvenirs de tous les visiteurs. {nom} déposa le sien : une promesse à sa mère.</p>
+<p>Le château disparut. Mais la promesse resta gravée.</p>`,
+[{q:"Tous les combien apparaît le château ?",options:["Chaque année","Chaque siècle","Chaque mois","Jamais"],correct:1},
+ {q:"Que dépose {nom} ?",options:["De l'or","Une promesse","Un livre","Une fleur"],correct:1}]),
+
+C("La Clé des Rêves", `
+<p>Une clé dorée ouvrait les rêves. {nom} l'utilisa pour entrer dans le rêve d'un enfant malade.</p>
+<p>Là, il créa un monde joyeux, plein de rires. L'enfant guérit en souriant.</p>
+<p>Depuis, {nom} visite les rêves pour consoler.</p>`,
+[{q:"Qu'ouvre la clé ?",options:["Une porte","Les rêves","Un coffre","Un château"],correct:1},
+ {q:"Qui {nom} aide-t-il ?",options:["Un roi","Un enfant malade","Un dragon","Un géant"],correct:1}]),
+
+C("Le Dernier Dragon", `
+<p>Le dernier dragon vivait caché dans une caverne. {nom} le trouva.</p>
+<p>Le dragon pleurait : plus personne ne croyait en lui. {nom} promit de raconter son existence.</p>
+<p>Il tint parole. Depuis, les enfants cherchent le dragon... et parfois, au loin, une aile brille.</p>`,
+[{q:"Où vit le dragon ?",options:["Dans la mer","Dans une caverne","Dans un château","Dans un arbre"],correct:1},
+ {q:"Que promet {nom} ?",options:["De le cacher","De raconter son existence","De le tuer","De le vendre"],correct:1}])
+];
+
+/* ---------- FORÊT (20) ---------- */
+MODELES.foret = [
+C("Le Chêne qui Parle", `
+<p>Un grand chêne s'ennuyait. Un jour, une fillette s'assit à son ombre. Il chuchota : « Bonjour. » Elle sourit.</p>
+<p>Ils parlèrent des étoiles, des oiseaux, du temps. Quand le chêne tomba malade, la fillette veilla trois nuits. Une feuille verte repoussa.</p>
+<p>Depuis, les arbres parlent à ceux qui écoutent.</p>`,
+[{q:"Qui parle au chêne ?",options:["Un roi","Une fillette","Un loup","Un géant"],correct:1},
+ {q:"Combien de nuits veille-t-elle ?",options:["Une","Deux","Trois","Quatre"],correct:2}]),
+
+C("La Fée des Fougères", `
+<p>Une fée vivait sous les fougères. {nom} la rencontra par hasard.</p>
+<p>Elle offrit un souhait. {nom} demanda : « Que la forêt ne brûle jamais. » La fée sourit, touchée.</p>
+<p>Depuis, un voile protecteur entoure les arbres.</p>`,
+[{q:"Où vit la fée ?",options:["Dans un château","Sous les fougères","Dans la mer","Au sommet d'un arbre"],correct:1},
+ {q:"Que souhaite {nom} ?",options:["De l'or","Que la forêt ne brûle jamais","Un château","Une épée"],correct:1}]),
+
+C("Le Loup Blanc", `
+<p>Un loup blanc apparaissait la nuit. {nom} le suivit.</p>
+<p>Le loup le mena à un cerf blessé. Ensemble, ils le soignèrent. Le loup disparut, laissant une plume.</p>
+<p>{nom} comprit : aider les autres, c'est ça la magie.</p>`,
+[{q:"Quel animal {nom} suit-il ?",options:["Un renard","Un loup blanc","Un ours","Un cerf"],correct:1},
+ {q:"Qui est blessé ?",options:["Le loup","Un cerf","Un oiseau","Un enfant"],correct:1}]),
+
+C("Les Champignons Chanteurs", `
+<p>Dans une clairière, des champignons chantaient. {nom} s'approcha.</p>
+<p>Chaque champignon racontait une histoire. {nom} écouta jusqu'au matin.</p>
+<p>Depuis, il sait que la forêt chante à ceux qui s'arrêtent.</p>`,
+[{q:"Que font les champignons ?",options:["Ils dansent","Ils chantent","Ils dorment","Ils parlent"],correct:1},
+ {q:"Combien de temps {nom} écoute-t-il ?",options:["Une heure","Jusqu'au matin","Un jour","Une semaine"],correct:1}]),
+
+C("L'Arbre aux Mille Portes", `
+<p>Un arbre avait mille portes. Chaque porte ouvrait un monde. {nom} en ouvrit une.</p>
+<p>Il trouva un monde où les animaux parlaient. Il y passa un jour entier.</p>
+<p>Depuis, il revient chaque semaine.</p>`,
+[{q:"Combien de portes a l'arbre ?",options:["Cent","Mille","Dix","Une"],correct:1},
+ {q:"Que trouve {nom} derrière une porte ?",options:["De l'or","Un monde où les animaux parlent","Un roi","Un trésor"],correct:1}]),
+
+C("La Rivière des Souvenirs", `
+<p>Une rivière montrait des souvenirs à qui s'y penchait. {nom} vit son enfance.</p>
+<p>Il vit aussi sa grand-mère, disparue. Elle lui sourit. {nom} pleura, puis rit.</p>
+<p>La rivière murmura : « Les souvenirs restent. »</p>`,
+[{q:"Que montre la rivière ?",options:["L'avenir","Les souvenirs","De l'or","Des poissons"],correct:1},
+ {q:"Qui {nom} voit-il ?",options:["Un roi","Sa grand-mère","Un loup","Un ami"],correct:1}]),
+
+C("Le Papillon de Lune", `
+<p>Un papillon argenté volait la nuit. {nom} le suivit jusqu'à un lac.</p>
+<p>Le papillon se posa sur l'eau. Le lac s'illumina. {nom} y vit des poissons d'or.</p>
+<p>Il comprit qu'il ne fallait pas les pêcher, seulement les admirer.</p>`,
+[{q:"De quelle couleur est le papillon ?",options:["Rouge","Argenté","Bleu","Vert"],correct:1},
+ {q:"Que voit {nom} dans le lac ?",options:["Des sirènes","Des poissons d'or","Un trésor","Un château"],correct:1}]),
+
+C("Le Vieux Sage de la Forêt", `
+<p>Un sage vivait dans un arbre creux. {nom} vint lui demander conseil.</p>
+<p>« Comment être heureux ? » Le sage répondit : « Regarde autour de toi. » {nom} vit les oiseaux, les fleurs, le ciel.</p>
+<p>Il comprit : le bonheur est déjà là.</p>`,
+[{q:"Où vit le sage ?",options:["Dans une grotte","Dans un arbre creux","Dans un château","Dans une cabane"],correct:1},
+ {q:"Que répond le sage ?",options:["Cours","Regarde autour de toi","Dors","Mange"],correct:1}]),
+
+C("La Pluie de Pétales", `
+<p>Chaque printemps, une pluie de pétales tombait sur un village. {nom} voulut savoir pourquoi.</p>
+<p>Au sommet d'un cerisier, une fée pleurait de joie. Ses larmes devenaient pétales.</p>
+<p>{nom} lui offrit un poème. Depuis, la pluie est encore plus belle.</p>`,
+[{q:"Quand tombe la pluie de pétales ?",options:["En hiver","Au printemps","En été","En automne"],correct:1},
+ {q:"Que sont les pétales ?",options:["Des feuilles","Les larmes d'une fée","De la neige","Des plumes"],correct:1}]),
+
+C("Le Chemin qui se Perdait", `
+<p>Un sentier changeait de direction chaque nuit. {nom} décida de le suivre.</p>
+<p>Il arriva à une maison où vivait un vieil homme. « Tu as suivi le chemin, dit-il. Maintenant, suis ton cœur. »</p>
+<p>{nom} rentra chez lui et réalisa son rêve d'enfance.</p>`,
+[{q:"Que fait le sentier ?",options:["Il disparaît","Il change de direction","Il chante","Il brûle"],correct:1},
+ {q:"Que conseille le vieil homme ?",options:["De dormir","De suivre son cœur","De partir","De crier"],correct:1}]),
+
+C("Les Abeilles Magiques", `
+<p>Des abeilles produisaient un miel qui guérissait. {nom} voulut les remercier.</p>
+<p>Il planta des fleurs autour de la ruche. Les abeilles dansèrent.</p>
+<p>Depuis, le miel est encore meilleur.</p>`,
+[{q:"Que fait le miel ?",options:["Il rend riche","Il guérit","Il endort","Il rend fort"],correct:1},
+ {q:"Comment {nom} remercie-t-il les abeilles ?",options:["En criant","En plantant des fleurs","En chantant","En dansant"],correct:1}]),
+
+C("Le Renard Philosophe", `
+<p>Un renard aimait poser des questions. {nom} s'assit près de lui.</p>
+<p>« Pourquoi les étoiles brillent ? » demanda le renard. « Pour nous guider », répondit {nom}. Le renard sourit.</p>
+<p>Ils passèrent la nuit à parler. Depuis, {nom} regarde le ciel autrement.</p>`,
+[{q:"Quel animal pose des questions ?",options:["Un loup","Un renard","Un hibou","Un ours"],correct:1},
+ {q:"Pourquoi les étoiles brillent-elles ?",options:["Pour nous guider","Pour brûler","Pour dormir","Pour rire"],correct:0}]),
+
+C("La Fontaine des Fées", `
+<p>Une fontaine exauçait les vœux, mais seulement ceux des enfants. {nom} y alla avec sa petite sœur.</p>
+<p>Sa sœur fit un vœu : « Que mon frère soit heureux. » {nom} fut ému.</p>
+<p>Depuis, il sourit plus souvent.</p>`,
+[{q:"Qui peut faire un vœu ?",options:["Les rois","Les enfants","Les vieillards","Les animaux"],correct:1},
+ {q:"Quel vœu fait la sœur ?",options:["De l'or","Que son frère soit heureux","Un château","Une poupée"],correct:1}]),
+
+C("Le Cerf aux Bois d'Or", `
+<p>Un cerf aux bois d'or apparaissait à ceux qui en avaient besoin. {nom} le vit un jour de tristesse.</p>
+<p>Le cerf posa sa tête sur son épaule. {nom} sentit une paix profonde.</p>
+<p>Depuis, il sait que la nature console.</p>`,
+[{q:"De quelle couleur sont les bois du cerf ?",options:["Argent","Or","Rouge","Bleu"],correct:1},
+ {q:"Quand {nom} voit-il le cerf ?",options:["Un jour de fête","Un jour de tristesse","La nuit","Au printemps"],correct:1}]),
+
+C("La Cabane dans les Arbres", `
+<p>Une cabane cachée dans les arbres attendait un visiteur. {nom} la trouva.</p>
+<p>À l'intérieur : un carnet. Chaque visiteur y écrivait un rêve. {nom} écrivit le sien.</p>
+<p>Des années plus tard, il revint... et vit que son rêve s'était réalisé.</p>`,
+[{q:"Que trouve {nom} dans la cabane ?",options:["Un trésor","Un carnet","Une épée","Un livre de magie"],correct:1},
+ {q:"Que fait-il dans le carnet ?",options:["Il dessine","Il écrit un rêve","Il efface","Il déchire"],correct:1}]),
+
+C("Le Rossignol Aveugle", `
+<p>Un rossignol aveugle chantait divinement. {nom} l'écouta chaque soir.</p>
+<p>Un jour, il demanda : « Comment chantes-tu si bien ? » L'oiseau : « Je ne vois pas le monde, je le sens. »</p>
+<p>{nom} apprit à écouter autrement.</p>`,
+[{q:"Quel oiseau chante ?",options:["Un merle","Un rossignol","Un corbeau","Une colombe"],correct:1},
+ {q:"Pourquoi chante-t-il si bien ?",options:["Il voit tout","Il sent le monde","Il est magicien","Il est triste"],correct:1}]),
+
+C("La Pierre qui Poussait", `
+<p>Une pierre grossissait chaque année. {nom} voulut savoir pourquoi.</p>
+<p>En la touchant, il vit des siècles défiler. La pierre racontait l'histoire de la forêt.</p>
+<p>{nom} décida de la protéger. Elle devint un monument.</p>`,
+[{q:"Que fait la pierre ?",options:["Elle rapetisse","Elle grossit","Elle chante","Elle brille"],correct:1},
+ {q:"Que raconte la pierre ?",options:["L'avenir","L'histoire de la forêt","Des blagues","De la musique"],correct:1}]),
+
+C("Le Sentier des Lucioles", `
+<p>Un sentier s'illuminait la nuit grâce aux lucioles. {nom} le suivit.</p>
+<p>Au bout, une clairière où dansaient des enfants-fées. Ils invitèrent {nom} à danser.</p>
+<p>Depuis, il revient chaque été.</p>`,
+[{q:"Qui illumine le sentier ?",options:["Des lampes","Des lucioles","Des étoiles","Des fées"],correct:1},
+ {q:"Que font les enfants-fées ?",options:["Ils dorment","Ils dansent","Ils mangent","Ils pleurent"],correct:1}]),
+
+C("Le Miroir de la Forêt", `
+<p>Un miroir posé entre deux arbres montrait l'âme. {nom} s'y regarda.</p>
+<p>Il vit un enfant joyeux. Il sourit, comprit qu'il n'avait pas changé au fond.</p>
+<p>Depuis, il garde son cœur d'enfant.</p>`,
+[{q:"Que montre le miroir ?",options:["Le visage","L'âme","L'avenir","Le passé"],correct:1},
+ {q:"Que voit {nom} ?",options:["Un roi","Un enfant joyeux","Un loup","Un trésor"],correct:1}]),
+
+C("Le Grand Cerf Blanc", `
+<p>Un cerf blanc guidait les voyageurs perdus. {nom} se perdit un jour.</p>
+<p>Le cerf apparut. Il le ramena chez lui. {nom} voulut le remercier, mais le cerf disparut.</p>
+<p>Depuis, {nom} guide les autres à son tour.</p>`,
+[{q:"Quel animal guide ?",options:["Un loup","Un cerf blanc","Un renard","Un ours"],correct:1},
+ {q:"Que fait {nom} après ?",options:["Il pleure","Il guide les autres","Il dort","Il part"],correct:1}])
+];
+
+/* ---------- VILLE (20) ---------- */
+MODELES.ville = [
+C("Le Jardin Caché", `
+<p>Dans une ville bruyante, {nom} remarqua une lumière entre deux immeubles.</p>
+<p>Il poussa une porte rouillée et découvrit un jardin suspendu rempli de fleurs lumineuses.</p>
+<p>Un vieil homme y arrosait en chantant. « Ce jardin ne s'ouvre qu'à ceux qui prennent le temps de regarder. » Depuis, {nom} y vient chaque semaine.</p>`,
+[{q:"Où se cache le jardin ?",options:["Sous terre","Entre deux immeubles","Sur un toit","Dans un parc"],correct:1},
+ {q:"Qui arrose le jardin ?",options:["Un enfant","Un vieil homme","Un chat","Une fée"],correct:1}]),
+
+C("Le Métro des Rêves", `
+<p>Un métro apparaissait à minuit. {nom} y monta.</p>
+<p>Chaque station était un rêve. Il visita un monde de bonbons, un ciel de poissons.</p>
+<p>Au terminus, le conducteur dit : « Maintenant, invente le tien. » {nom} sourit.</p>`,
+[{q:"À quelle heure apparaît le métro ?",options:["Midi","Minuit","6h","18h"],correct:1},
+ {q:"Que sont les stations ?",options:["Des villes","Des rêves","Des magasins","Des musées"],correct:1}]),
+
+C("La Tour aux mille Fenêtres", `
+<p>Une tour avait mille fenêtres. Chacune montrait une vie différente. {nom} en regarda une.</p>
+<p>Il y vit un homme heureux. Puis une autre : une femme triste. {nom} comprit que chaque vie a sa beauté.</p>
+<p>Il redescendit, plus tolérant.</p>`,
+[{q:"Combien de fenêtres ?",options:["Cent","Mille","Dix","Une"],correct:1},
+ {q:"Que montrent-elles ?",options:["Des trésors","Des vies différentes","Le ciel","Des magasins"],correct:1}]),
+
+C("Le Chat des Toits", `
+<p>Un chat noir guidait les enfants perdus dans la ville. {nom} le suivit.</p>
+<p>Le chat le mena à une place secrète où jouaient des enfants. {nom} se fit des amis.</p>
+<p>Depuis, il remercie le chat chaque soir.</p>`,
+[{q:"Quel animal guide ?",options:["Un chien","Un chat noir","Un pigeon","Un rat"],correct:1},
+ {q:"Où mène-t-il {nom} ?",options:["À l'école","À une place secrète","Au marché","Chez lui"],correct:1}]),
+
+C("La Bibliothèque de Minuit", `
+<p>Une bibliothèque ouvrait à minuit. {nom} y entra.</p>
+<p>Les livres parlaient. Un lui raconta sa propre histoire, pas encore écrite. {nom} comprit qu'il pouvait changer la fin.</p>
+<p>Depuis, il écrit chaque jour.</p>`,
+[{q:"Quand ouvre la bibliothèque ?",options:["Le matin","À minuit","À midi","Le soir"],correct:1},
+ {q:"Que font les livres ?",options:["Ils dorment","Ils parlent","Ils volent","Ils brûlent"],correct:1}]),
+
+C("Le Marché aux Couleurs", `
+<p>Un marché vendait des couleurs en pots. {nom} acheta du bleu.</p>
+<p>Il peignit le ciel de sa chambre. Le lendemain, le ciel réel devint plus bleu.</p>
+<p>Depuis, il peint chaque jour un peu d'espoir.</p>`,
+[{q:"Que vend le marché ?",options:["Des fruits","Des couleurs","Des livres","Des jouets"],correct:1},
+ {q:"Que peint {nom} ?",options:["Un mur","Le ciel de sa chambre","Un arbre","Un chat"],correct:1}]),
+
+C("Le Pont des Soupirs", `
+<p>Sur un pont, les gens murmuraient leurs peines. {nom} y alla.</p>
+<p>Il écouta un vieil homme. En parlant, celui-ci sourit enfin. {nom} comprit qu'écouter guérit.</p>
+<p>Depuis, il revient chaque dimanche.</p>`,
+[{q:"Que font les gens sur le pont ?",options:["Ils chantent","Ils murmurent leurs peines","Ils dansent","Ils dorment"],correct:1},
+ {q:"Qu'est-ce qui guérit ?",options:["L'argent","Écouter","Manger","Courir"],correct:1}]),
+
+C("La Statue qui Sourit", `
+<p>Une statue triste trônait sur une place. {nom} lui parla chaque jour.</p>
+<p>Un matin, elle sourit. La ville entière s'émerveilla. {nom} comprit que la gentillesse transforme.</p>
+<p>Depuis, la place est un lieu de joie.</p>`,
+[{q:"Comment est la statue au début ?",options:["Joyeuse","Triste","En colère","Endormie"],correct:1},
+ {q:"Que fait {nom} chaque jour ?",options:["Il crie","Il parle à la statue","Il la lave","Il part"],correct:1}]),
+
+C("Le Bus qui Allait Nulle Part", `
+<p>Un bus passait sans destination. {nom} monta.</p>
+<p>Il traversa des paysages impossibles. Le conducteur dit : « Ce bus va là où tu veux. » {nom} pensa à la mer.</p>
+<p>Le bus l'y emmena. Depuis, il croit à l'impossible.</p>`,
+[{q:"Où va le bus ?",options:["À l'école","Nulle part / là où on veut","À la mer uniquement","Au marché"],correct:1},
+ {q:"Où veut aller {nom} ?",options:["À la montagne","À la mer","En ville","Dans la forêt"],correct:1}]),
+
+C("Le Musicien du Métro", `
+<p>Un musicien jouait divinement dans le métro. {nom} s'arrêta.</p>
+<p>Il jouait pour sa fille malade. {nom} l'aida à récolter des fonds.</p>
+<p>La fille guérit. Depuis, le musicien joue gratuitement.</p>`,
+[{q:"Où joue le musicien ?",options:["Dans un parc","Dans le métro","À l'église","Sur un toit"],correct:1},
+ {q:"Pour qui joue-t-il ?",options:["Pour l'argent","Pour sa fille malade","Pour le roi","Pour lui"],correct:1}]),
+
+C("La Fenêtre du 7e Étage", `
+<p>Une fenêtre du 7e étage s'illuminait la nuit. {nom} alla voir.</p>
+<p>Une vieille dame y écrivait des lettres à son mari disparu. {nom} lui proposa de les lire.</p>
+<p>Depuis, il vient chaque semaine. Elle lui raconte sa vie.</p>`,
+[{q:"Quel étage ?",options:["1er","3e","7e","10e"],correct:2},
+ {q:"À qui écrit la dame ?",options:["À son fils","À son mari disparu","À un ami","Au maire"],correct:1}]),
+
+C("Le Fantôme du Cinéma", `
+<p>Un cinéma hanté projetait des films oubliés. {nom} y entra.</p>
+<p>Le fantôme, timide, adorait les comédies. {nom} rit avec lui.</p>
+<p>Depuis, le cinéma ne fait plus peur à personne.</p>`,
+[{q:"Qu'aime le fantôme ?",options:["Les films d'horreur","Les comédies","Les documentaires","Les dessins animés"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il crie","Il rit avec lui","Il part","Il appelle la police"],correct:1}]),
+
+C("Le Vendeur de Rêves", `
+<p>Un homme vendait des rêves en bouteille. {nom} en acheta un.</p>
+<p>Il rêva d'un monde parfait. À son réveil, il décida de rendre le sien meilleur.</p>
+<p>Depuis, il sourit plus souvent.</p>`,
+[{q:"Que vend l'homme ?",options:["Des bonbons","Des rêves","Des livres","Des fleurs"],correct:1},
+ {q:"Que fait {nom} au réveil ?",options:["Il pleure","Il décide de rendre son monde meilleur","Il dort encore","Il part"],correct:1}]),
+
+C("La Piscine des Étoiles", `
+<p>Une piscine abandonnée devenait un lac d'étoiles la nuit. {nom} y plongea.</p>
+<p>Il nagea parmi les constellations. Il comprit que la ville cache des merveilles.</p>
+<p>Depuis, il cherche la beauté partout.</p>`,
+[{q:"Que devient la piscine ?",options:["Un lac d'étoiles","Un marché","Un jardin","Une école"],correct:0},
+ {q:"Que comprend {nom} ?",options:["Que la ville est laide","Que la ville cache des merveilles","Qu'il faut partir","Qu'il faut dormir"],correct:1}]),
+
+C("Le Grand-Père du Banc Public", `
+<p>Un vieil homme parlait aux pigeons chaque matin. {nom} s'assit près de lui.</p>
+<p>Il racontait la guerre, l'amour, la vie. {nom} apprit beaucoup.</p>
+<p>Un jour, le banc fut vide. {nom} continua à y venir.</p>`,
+[{q:"À qui parle le vieil homme ?",options:["Aux enfants","Aux pigeons","Aux statues","Aux arbres"],correct:1},
+ {q:"Que fait {nom} après sa disparition ?",options:["Il oublie","Il continue à venir au banc","Il part","Il pleure"],correct:1}]),
+
+C("La Boulangerie de l'Aube", `
+<p>Une boulangerie ouvrait à 4h. {nom} y alla.</p>
+<p>La boulangère offrait du pain chaud aux sans-abri. {nom} l'aida.</p>
+<p>Depuis, il croit à la bonté.</p>`,
+[{q:"À quelle heure ouvre la boulangerie ?",options:["6h","4h","8h","Midi"],correct:1},
+ {q:"À qui offre-t-elle du pain ?",options:["Aux riches","Aux sans-abri","Aux rois","Aux animaux"],correct:1}]),
+
+C("Le Téléphone de l'Espoir", `
+<p>Une cabine téléphonique sonnait sans raison. {nom} décrocha.</p>
+<p>Une voix demanda : « Comment vas-tu ? » {nom} répondit honnêtement. La voix le consola.</p>
+<p>Depuis, il décroche chaque fois qu'elle sonne.</p>`,
+[{q:"Quel objet sonne ?",options:["Un téléphone portable","Une cabine téléphonique","Une cloche","Un tambour"],correct:1},
+ {q:"Que demande la voix ?",options:["De l'argent","Comment il va","De partir","De crier"],correct:1}]),
+
+C("Le Cinéma en Plein Air", `
+<p>Chaque été, un cinéma s'installait sur un toit. {nom} y alla.</p>
+<p>On y projetait des films muets. Un vieil homme jouait du piano. {nom} fut ému.</p>
+<p>Depuis, il y retourne chaque année.</p>`,
+[{q:"Où s'installe le cinéma ?",options:["Dans un parc","Sur un toit","À la plage","Dans une école"],correct:1},
+ {q:"Quel type de films ?",options:["Des films d'action","Des films muets","Des dessins animés","Des documentaires"],correct:1}]),
+
+C("Le Kiosque à Histoires", `
+<p>Un kiosque vendait des histoires à la voix. {nom} en acheta une.</p>
+<p>Il écouta un conte magnifique. Depuis, il raconte à son tour.</p>
+<p>Le kiosque ferma un jour, mais {nom} garda l'histoire.</p>`,
+[{q:"Que vend le kiosque ?",options:["Des journaux","Des histoires à la voix","Des bonbons","Des fleurs"],correct:1},
+ {q:"Que fait {nom} ensuite ?",options:["Il oublie","Il raconte à son tour","Il part","Il dort"],correct:1}]),
+
+C("Le Chat Peintre", `
+<p>Un chat peignait sur les murs la nuit. {nom} le surprit.</p>
+<p>Il peignait des rêves. {nom} l'aida. Depuis, les murs de la ville sont remplis de couleurs.</p>
+<p>Les gens sourient en passant.</p>`,
+[{q:"Que fait le chat la nuit ?",options:["Il dort","Il peint","Il chante","Il mange"],correct:1},
+ {q:"Que peint-il ?",options:["Des maisons","Des rêves","Des visages","Des animaux"],correct:1}]),
+
+C("La Gare des Adieux", `
+<p>À la gare, {nom} vit des adieux. Certains joyeux, d'autres tristes.</p>
+<p>Il remarqua une fillette en pleurs. Son père partait. {nom} lui offrit un ballon.</p>
+<p>Elle sourit. Depuis, {nom} offre toujours un sourire.</p>`,
+[{q:"Que voit {nom} à la gare ?",options:["Des trains","Des adieux","Des magasins","Des jardins"],correct:1},
+ {q:"Que fait-il pour la fillette ?",options:["Il crie","Il lui offre un ballon","Il part","Il dort"],correct:1}])
+];
+
+/* ---------- VILLAGE (20) ---------- */
+MODELES.village = [
+C("La Fontaine qui Chantait", `
+<p>Une fontaine chantait. Un jour, elle cessa. {nom} alla voir la fée de la source.</p>
+<p>« Pourquoi ne chante-t-elle plus ? » demanda-t-il. « Plus personne ne lui dit merci. »</p>
+<p>{nom} rassembla le village. Tous chantèrent. L'eau revint. Depuis, une fête a lieu chaque année.</p>`,
+[{q:"Pourquoi la fontaine ne chante-t-elle plus ?",options:["Elle est cassée","Personne ne la remercie","Elle est vide","Elle dort"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il part","Il rassemble le village","Il pleure","Il répare"],correct:1}]),
+
+C("Le Boulanger Rêveur", `
+<p>Un boulanger faisait des pains en forme d'animaux. {nom} les adorait.</p>
+<p>Un jour, il perdit son inspiration. {nom} lui raconta un conte. Le boulanger créa un pain-dragon.</p>
+<p>Depuis, tout le village en parle.</p>`,
+[{q:"Que fait le boulanger ?",options:["Des gâteaux","Des pains en forme d'animaux","Des pizzas","Des crêpes"],correct:1},
+ {q:"Quelle forme crée-t-il ?",options:["Un pain-chat","Un pain-dragon","Un pain-oiseau","Un pain-arbre"],correct:1}]),
+
+C("La Fête des Lanternes", `
+<p>Chaque année, le village lançait des lanternes. {nom} en fabriqua une.</p>
+<p>Il y écrivit son rêve. La lanterne vola haut. Un an plus tard, son rêve se réalisa.</p>
+<p>Depuis, il aide les autres à écrire les leurs.</p>`,
+[{q:"Que lance le village ?",options:["Des ballons","Des lanternes","Des fleurs","Des pierres"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il écrit son rêve","Il dessine","Il chante","Il pleure"],correct:0}]),
+
+C("Le Vieux Moulin", `
+<p>Un moulin ne tournait plus depuis des années. {nom} décida de le réparer.</p>
+<p>Il demanda de l'aide au village. Ensemble, ils le remirent en marche.</p>
+<p>Depuis, la farine est la meilleure de la région.</p>`,
+[{q:"Que répare {nom} ?",options:["Une maison","Un moulin","Une église","Un pont"],correct:1},
+ {q:"Qui aide {nom} ?",options:["Personne","Le village","Un roi","Un magicien"],correct:1}]),
+
+C("Le Jardin de la Maîtresse", `
+<p>La maîtresse du village cultivait un jardin. {nom} y passa l'été.</p>
+<p>Elle lui apprit à planter, arroser, attendre. {nom} comprit la patience.</p>
+<p>Depuis, il cultive son propre potager.</p>`,
+[{q:"Que cultive la maîtresse ?",options:["Des fleurs","Un jardin","Du blé","Des arbres"],correct:1},
+ {q:"Qu'apprend {nom} ?",options:["La patience","La colère","La peur","La vitesse"],correct:0}]),
+
+C("Le Puits aux Souhaits", `
+<p>Un puits exauçait les vœux. {nom} y lança une pièce.</p>
+<p>Il souhaita que sa famille soit heureuse. Son souhait se réalisa.</p>
+<p>Depuis, il aide les autres à réaliser leurs rêves.</p>`,
+[{q:"Que fait le puits ?",options:["Il parle","Il exauce les vœux","Il chante","Il dort"],correct:1},
+ {q:"Que souhaite {nom} ?",options:["De l'or","Sa famille heureuse","Un château","Une épée"],correct:1}]),
+
+C("La Cloche du Village", `
+<p>Une cloche sonnait chaque matin. Un jour, elle resta silencieuse.</p>
+<p>{nom} monta au clocher. Un oiseau y avait fait son nid. {nom} attendit que les oisillons s'envolent.</p>
+<p>La cloche sonna de nouveau, plus belle qu'avant.</p>`,
+[{q:"Où est la cloche ?",options:["À l'école","Au clocher","Au marché","Dans un arbre"],correct:1},
+ {q:"Qui empêche la cloche de sonner ?",options:["Un chat","Un oiseau","Un roi","Un géant"],correct:1}]),
+
+C("Le Fromage du Berger", `
+<p>Un berger faisait un fromage délicieux. {nom} voulut connaître son secret.</p>
+<p>Le berger sourit : « Je chante à mes chèvres chaque matin. » {nom} essaya. Son fromage fut délicieux.</p>
+<p>Depuis, il chante en cuisinant.</p>`,
+[{q:"Que fait le berger ?",options:["Du fromage","Du pain","Du vin","Du miel"],correct:0},
+ {q:"Quel est son secret ?",options:["Il dort","Il chante aux chèvres","Il court","Il crie"],correct:1}]),
+
+C("La Sorcière du Bout du Chemin", `
+<p>Une sorcière habitait au bout du chemin. {nom} osa frapper.</p>
+<p>Elle était gentille et cultivait des plantes magiques. Elle offrit à {nom} une graine.</p>
+<p>Une fleur magnifique poussa. Depuis, les gens n'ont plus peur d'elle.</p>`,
+[{q:"Où habite la sorcière ?",options:["Au château","Au bout du chemin","Dans la ville","Au sommet"],correct:1},
+ {q:"Que donne-t-elle ?",options:["Une potion","Une graine","Une épée","Un livre"],correct:1}]),
+
+C("Le Marché du Samedi", `
+<p>Chaque samedi, un marché animait le village. {nom} y allait chaque semaine.</p>
+<p>Il y apprit à négocier, à écouter, à rire. Le marché devint son école de vie.</p>
+<p>Depuis, il y tient son propre stand.</p>`,
+[{q:"Quel jour a lieu le marché ?",options:["Lundi","Mercredi","Samedi","Dimanche"],correct:2},
+ {q:"Que devient {nom} ?",options:["Marchand","Boulanger","Roi","Chanteur"],correct:0}]),
+
+C("Le Chien du Meunier", `
+<p>Le chien du meunier veillait chaque nuit. {nom} le rejoignit.</p>
+<p>Ensemble, ils chassèrent un renard. Le meunier les remercia.</p>
+<p>Depuis, {nom} a un ami fidèle.</p>`,
+[{q:"Qui veille la nuit ?",options:["Le chat","Le chien","Le meunier","Le renard"],correct:1},
+ {q:"Qui chassent-ils ?",options:["Un loup","Un renard","Un ours","Un oiseau"],correct:1}]),
+
+C("La Vieille École", `
+<p>Une école abandonnée fut rouverte. {nom} y entra.</p>
+<p>Sur le tableau, une phrase : « Apprends et transmets. » {nom} décida d'enseigner aux enfants.</p>
+<p>Depuis, l'école est pleine.</p>`,
+[{q:"Que trouve {nom} sur le tableau ?",options:["Un dessin","Une phrase","Un trésor","Une lettre"],correct:1},
+ {q:"Que décide-t-il ?",options:["Partir","Enseigner","Dormir","Fermer"],correct:1}]),
+
+C("Le Potager de la Grand-Mère", `
+<p>La grand-mère de {nom} avait un potager magique.</p>
+<p>Chaque légume racontait une histoire. {nom} apprit à écouter les carottes.</p>
+<p>Depuis, il aime jardiner.</p>`,
+[{q:"Qui a un potager ?",options:["Le maire","La grand-mère","Le boulanger","Le berger"],correct:1},
+ {q:"Que font les légumes ?",options:["Ils dorment","Ils racontent des histoires","Ils chantent","Ils parlent mal"],correct:1}]),
+
+C("Le Forgeron Poète", `
+<p>Un forgeron écrivait des poèmes. {nom} les découvrit.</p>
+<p>Il l'encouragea à les lire au village. Le forgeron devint célèbre.</p>
+<p>Depuis, il forge des mots autant que du fer.</p>`,
+[{q:"Que fait le forgeron ?",options:["Des poèmes","Des gâteaux","Des chansons","Des vêtements"],correct:0},
+ {q:"Que fait {nom} ?",options:["Il rit","Il l'encourage","Il part","Il critique"],correct:1}]),
+
+C("Le Père Noël du Village", `
+<p>Un vieil homme distribuait des cadeaux chaque hiver. {nom} l'aida.</p>
+<p>Il découvrit que les plus beaux cadeaux sont ceux faits main.</p>
+<p>Depuis, il fabrique des jouets.</p>`,
+[{q:"Que distribue le vieil homme ?",options:["De l'argent","Des cadeaux","Des bonbons","Des fleurs"],correct:1},
+ {q:"Qu'apprend {nom} ?",options:["À donner de l'argent","À faire des cadeaux faits main","À dormir","À chanter"],correct:1}]),
+
+C("La Fête du Village", `
+<p>Chaque année, le village faisait une fête. {nom} voulait y participer.</p>
+<p>Il prépara un spectacle. Les villageois rirent aux éclats. Depuis, il est le conteur officiel.</p>
+<p>Chaque année, il raconte de nouvelles histoires.</p>`,
+[{q:"Que prépare {nom} ?",options:["Un gâteau","Un spectacle","Un discours","Une danse"],correct:1},
+ {q:"Que devient-il ?",options:["Maire","Conteur officiel","Boulanger","Roi"],correct:1}]),
+
+C("Le Secret du Vieux Pont", `
+<p>Un vieux pont cachait un secret. {nom} le découvrit : une boîte sous une pierre.</p>
+<p>Dedans : une lettre d'un enfant d'il y a cent ans. {nom} répondit à la lettre.</p>
+<p>Il la cacha au même endroit. Un siècle plus tard, quelqu'un la lira.</p>`,
+[{q:"Que cache le pont ?",options:["De l'or","Une boîte avec une lettre","Un trésor","Un chat"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il la brûle","Il répond et la cache","Il la vend","Il la jette"],correct:1}]),
+
+C("La Bergère et les Étoiles", `
+<p>Une bergère parlait aux étoiles. {nom} s'émerveilla.</p>
+<p>Elle lui apprit à les reconnaître. Ensemble, ils passèrent la nuit à observer.</p>
+<p>Depuis, {nom} étudie les étoiles.</p>`,
+[{q:"À qui parle la bergère ?",options:["Aux moutons","Aux étoiles","Aux arbres","Aux oiseaux"],correct:1},
+ {q:"Que fait {nom} après ?",options:["Il dort","Il étudie les étoiles","Il part","Il pleure"],correct:1}]),
+
+C("Le Coq qui Réveillait Tout le Village", `
+<p>Un coq réveillait le village. Un jour, il tomba malade. {nom} le remplaça.</p>
+<p>Il chanta chaque matin. Le coq guérit, et depuis, ils chantent en duo.</p>
+<p>Le village ne se réveille jamais en retard.</p>`,
+[{q:"Qui réveille le village ?",options:["Un chien","Un coq","Un chat","Un oiseau"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il dort","Il remplace le coq","Il part","Il chante mal"],correct:1}]),
+
+C("La Petite Marchande de Fleurs", `
+<p>Une fillette vendait des fleurs. {nom} lui en achetait chaque jour.</p>
+<p>Il apprit qu'elle aidait sa mère malade. {nom} organisa une collecte.</p>
+<p>Depuis, la fillette sourit tous les jours.</p>`,
+[{q:"Que vend la fillette ?",options:["Des fruits","Des fleurs","Des bonbons","Des livres"],correct:1},
+ {q:"Pourquoi vend-elle ?",options:["Pour s'amuser","Pour aider sa mère malade","Pour voyager","Pour acheter des jouets"],correct:1}])
+];
+
+/* ---------- MARIN (20) ---------- */
+MODELES.marin = [
+C("La Sirène et le Jeune Marin", `
+<p>Un jeune marin entendit une voix au-dessus des vagues. C'était une sirène prisonnière d'un filet.</p>
+<p>Il plongea et la libéra. Elle lui offrit une perle qui permet de respirer sous l'eau.</p>
+<p>Depuis, {nom} explore les fonds marins avec elle. Ensemble, ils sauvèrent des dauphins et calmèrent des tempêtes.</p>`,
+[{q:"Qui est prisonnière ?",options:["Une tortue","Une sirène","Un dauphin","Un poisson"],correct:1},
+ {q:"Que reçoit {nom} ?",options:["Une épée","Une perle magique","De l'or","Un bateau"],correct:1}]),
+
+C("Le Phare des Tempêtes", `
+<p>Un phare guidait les bateaux. Un jour, sa lumière s'éteignit. {nom} monta.</p>
+<p>Un oiseau avait fait son nid dans la lampe. {nom} attendit, puis ralluma.</p>
+<p>Depuis, il veille sur le phare.</p>`,
+[{q:"Que fait le phare ?",options:["Il chante","Il guide les bateaux","Il pêche","Il dort"],correct:1},
+ {q:"Qui occupe la lampe ?",options:["Un chat","Un oiseau","Un pirate","Une sirène"],correct:1}]),
+
+C("Le Bateau Volant", `
+<p>Un bateau volait dans le ciel. {nom} monta à bord.</p>
+<p>Le capitaine explora les nuages. Il montra à {nom} des îles flottantes.</p>
+<p>Depuis, {nom} rêve de retourner dans le ciel.</p>`,
+[{q:"Où vole le bateau ?",options:["Sous l'eau","Dans le ciel","Sur la terre","Dans l'espace"],correct:1},
+ {q:"Que voit {nom} ?",options:["Des poissons","Des îles flottantes","Des villes","Des châteaux"],correct:1}]),
+
+C("Le Trésor de l'Épave", `
+<p>Une épave cachait un trésor. {nom} plongea.</p>
+<p>Dans le bateau, il trouva un coffre. À l'intérieur : des lettres d'amour, pas d'or.</p>
+<p>Il les rapporta au village. Elles furent rendues aux descendants.</p>`,
+[{q:"Que trouve {nom} dans l'épave ?",options:["De l'or","Des lettres d'amour","Une épée","Un coffre vide"],correct:1},
+ {q:"Que fait-il des lettres ?",options:["Il les garde","Il les rend aux descendants","Il les jette","Il les vend"],correct:1}]),
+
+C("Le Dauphin Guide", `
+<p>Un dauphin guidait les bateaux perdus. {nom} le rencontra.</p>
+<p>Le dauphin le mena à un port oublié. Là, {nom} découvrit un village accueillant.</p>
+<p>Depuis, il revient chaque été.</p>`,
+[{q:"Quel animal guide ?",options:["Un requin","Un dauphin","Une baleine","Un poisson"],correct:1},
+ {q:"Où mène-t-il {nom} ?",options:["À un port oublié","À un château","À la plage","À l'école"],correct:0}]),
+
+C("La Baleine Bleue", `
+<p>Une baleine bleue chantait au large. {nom} l'entendit.</p>
+<p>Il monta sur son dos. Elle lui fit visiter les fonds. {nom} vit des coraux magnifiques.</p>
+<p>Depuis, il protège les océans.</p>`,
+[{q:"Quel animal chante ?",options:["Un dauphin","Une baleine","Un requin","Un poisson"],correct:1},
+ {q:"Que fait {nom} après ?",options:["Il dort","Il protège les océans","Il pêche","Il part"],correct:1}]),
+
+C("Le Pirate au Cœur Tendre", `
+<p>Un pirate terrorisait les mers. {nom} découvrit qu'il aidait les pauvres.</p>
+<p>Le pirate lui montra sa cachette : des vivres pour les villages. {nom} l'aida.</p>
+<p>Depuis, ils naviguent ensemble.</p>`,
+[{q:"Que fait vraiment le pirate ?",options:["Il attaque","Il aide les pauvres","Il dort","Il chante"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il fuit","Il l'aide","Il le dénonce","Il rit"],correct:1}]),
+
+C("Le Poisson qui Parlait", `
+<p>Un poisson parlait. {nom} le rencontra.</p>
+<p>Il lui raconta les secrets de l'océan. {nom} apprit que la mer est vivante.</p>
+<p>Depuis, il parle aux poissons.</p>`,
+[{q:"Que fait le poisson ?",options:["Il chante","Il parle","Il danse","Il dort"],correct:1},
+ {q:"Que découvre {nom} ?",options:["Que la mer est morte","Que la mer est vivante","Que la mer est vide","Que la mer est froide"],correct:1}]),
+
+C("La Tempête Magique", `
+<p>Une tempête éclata. {nom} fut projeté sur une île.</p>
+<p>Là, il rencontra un vieux marin qui lui apprit à survivre. Ensemble, ils réparèrent un radeau.</p>
+<p>Depuis, {nom} respecte l'océan.</p>`,
+[{q:"Où est projeté {nom} ?",options:["Dans un château","Sur une île","Dans un désert","Dans une forêt"],correct:1},
+ {q:"Qui rencontre-t-il ?",options:["Un roi","Un vieux marin","Un pirate","Une sirène"],correct:1}]),
+
+C("Le Port aux Mille Couleurs", `
+<p>Un port coloré accueillait les voyageurs. {nom} y débarqua.</p>
+<p>Chaque maison avait une couleur. Chaque habitant racontait une histoire. {nom} écouta toutes.</p>
+<p>Depuis, il raconte le port aux autres.</p>`,
+[{q:"Comment sont les maisons ?",options:["Toutes blanches","Colorées","Grises","Noires"],correct:1},
+ {q:"Que font les habitants ?",options:["Ils dorment","Ils racontent des histoires","Ils pêchent","Ils chantent"],correct:1}]),
+
+C("Le Capitaine sans Bateau", `
+<p>Un capitaine avait perdu son bateau. {nom} l'aida à en construire un.</p>
+<p>Ensemble, ils naviguèrent. Le capitaine retrouva sa joie.</p>
+<p>Depuis, ils sont associés.</p>`,
+[{q:"Qu'a perdu le capitaine ?",options:["Son chapeau","Son bateau","Son trésor","Sa carte"],correct:1},
+ {q:"Que font-ils ensemble ?",options:["Ils dorment","Ils construisent un bateau","Ils pêchent","Ils chantent"],correct:1}]),
+
+C("La Méduse Lumineuse", `
+<p>Une méduse brillait dans la nuit. {nom} la suivit.</p>
+<p>Elle le mena à une grotte remplie de coraux lumineux. {nom} y passa la nuit.</p>
+<p>Depuis, il revient observer.</p>`,
+[{q:"Quel animal lumineux ?",options:["Un poisson","Une méduse","Une étoile","Un corail"],correct:1},
+ {q:"Où mène-t-elle {nom} ?",options:["À la plage","À une grotte de coraux","À un port","Au fond de l'eau noire"],correct:1}]),
+
+C("Le Grand Voilier Blanc", `
+<p>Un voilier blanc apparaissait chaque printemps. {nom} monta.</p>
+<p>Le capitaine était un fantôme joyeux. Il fit visiter le monde à {nom}.</p>
+<p>Depuis, {nom} attend chaque printemps.</p>`,
+[{q:"Quand apparaît le voilier ?",options:["En hiver","Au printemps","En été","En automne"],correct:1},
+ {q:"Qui est le capitaine ?",options:["Un roi","Un fantôme joyeux","Un pirate","Une sirène"],correct:1}]),
+
+C("Le Secret des Coraux", `
+<p>Les coraux blanchissaient. {nom} chercha pourquoi.</p>
+<p>Il découvrit que la mer était trop chaude. Il organisa le nettoyage des plages.</p>
+<p>Les coraux repoussèrent. Depuis, {nom} protège la mer.</p>`,
+[{q:"Pourquoi les coraux blanchissent ?",options:["Ils dorment","La mer est trop chaude","Ils sont malades","Ils sont vieux"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il nettoie les plages","Il pêche","Il dort","Il part"],correct:0}]),
+
+C("Le Marin et l'Étoile", `
+<p>Un marin suivait toujours la même étoile. {nom} lui demanda pourquoi.</p>
+<p>« C'est l'étoile de ma femme, dit-il. Elle veille sur moi. » {nom} fut touché.</p>
+<p>Depuis, il regarde les étoiles autrement.</p>`,
+[{q:"Que suit le marin ?",options:["La lune","Une étoile","Le soleil","Un phare"],correct:1},
+ {q:"Que représente l'étoile ?",options:["Une ville","Sa femme","Un trésor","Un rêve"],correct:1}]),
+
+C("Le Poisson Rouge dans l'Océan", `
+<p>Un poisson rouge fut relâché dans l'océan. {nom} s'inquiéta.</p>
+<p>Mais le poisson s'adapta et devint ami avec les autres. Il vécut heureux.</p>
+<p>{nom} comprit qu'on peut s'adapter partout.</p>`,
+[{q:"Où est relâché le poisson ?",options:["Dans un lac","Dans l'océan","Dans un aquarium","Dans une rivière"],correct:1},
+ {q:"Que comprend {nom} ?",options:["Qu'il faut rester chez soi","Qu'on peut s'adapter partout","Qu'il faut nager","Qu'il faut manger"],correct:1}]),
+
+C("Le Naufragé Heureux", `
+<p>Un homme naufragé vivait sur une île. {nom} le rencontra.</p>
+<p>Il était heureux : il avait tout ce qu'il fallait. {nom} comprit que le bonheur est simple.</p>
+<p>Depuis, {nom} apprécie ce qu'il a.</p>`,
+[{q:"Où vit le naufragé ?",options:["En ville","Sur une île","Dans un château","Dans la forêt"],correct:1},
+ {q:"Est-il heureux ?",options:["Non","Oui","Peut-être","Il ne sait pas"],correct:1}]),
+
+C("La Voile Rouge", `
+<p>Un bateau à voile rouge arrivait chaque année. {nom} attendait.</p>
+<p>Le capitaine offrait un livre à un enfant du village. Cette année, ce fut {nom}.</p>
+<p>Depuis, il lit chaque nuit.</p>`,
+[{q:"De quelle couleur est la voile ?",options:["Bleue","Rouge","Verte","Blanche"],correct:1},
+ {q:"Que reçoit {nom} ?",options:["De l'or","Un livre","Une épée","Un poisson"],correct:1}]),
+
+C("Le Chant de la Baleine", `
+<p>Une baleine chantait une mélodie triste. {nom} l'écouta.</p>
+<p>Il comprit qu'elle cherchait son petit. Il l'aida à le retrouver.</p>
+<p>Depuis, elles chantent ensemble.</p>`,
+[{q:"Que fait la baleine ?",options:["Elle danse","Elle chante","Elle nage vite","Elle dort"],correct:1},
+ {q:"Qui cherche-t-elle ?",options:["Son ami","Son petit","Un poisson","Un marin"],correct:1}])
+];
+
+/* ---------- DRÔLES (20 — très rigolo) ---------- */
+MODELES.drole = [
+C("Le Poulet qui Parlait Anglais", `
+<p>Un fermier achète un poulet. Le lendemain, le poulet dit : « Good morning ! » Le fermier tombe de sa chaise.</p>
+<p>Le surlendemain : « How are you ? » Le fermier appelle le vétérinaire. Le vétérinaire examine le poulet puis dit : « Monsieur, ce poulet parle anglais. » Le fermier : « Et alors ? Moi je parle français ! »</p>
+<p>Le poulet, vexé, ne dit plus un mot... mais il chante "Joyeux anniversaire" à Noël. 🎂</p>`,
+[{q:"Quelle langue parle le poulet ?",options:["Français","Anglais","Espagnol","Chinois"],correct:1},
+ {q:"Que chante-t-il à Noël ?",options:["Une berceuse","Joyeux anniversaire","Noël","Rien"],correct:1}]),
+
+C("Le Chat qui Voulait Être Chien", `
+<p>Un chat décide d'aboyer. « Wouf ! Miaou... Wouf ! Miaou... » Le chien l'entend et dit : « Moi aussi je voulais être chat. J'ai ronronné trois mois. Résultat : j'ai avalé une souris. »</p>
+<p>Le chat réfléchit... et resta chat. Depuis, ils font des concours de sieste. 😴</p>`,
+[{q:"Quel animal veut aboyer ?",options:["Un chien","Un chat","Un poulet","Un loup"],correct:1},
+ {q:"Qu'a avalé le chien ?",options:["Une souris","Un os","Une chaussette","Un poisson"],correct:0}]),
+
+C("La Grand-Mère au Supermarché", `
+<p>Une grand-mère entre au supermarché. À la caisse, elle sort : une chaussure, un œuf dur, un téléphone éteint et un chat en peluche.</p>
+<p>La caissière, très calme : « Ce sera tout ? » « Ah non, j'ai oublié ma liste ! » Et elle repart, laissant tout. Le chat en peluche est devenu la mascotte du magasin. 🐱</p>`,
+[{q:"Combien d'objets sort la grand-mère ?",options:["2","3","4","5"],correct:2},
+ {q:"Qu'est devenu le chat ?",options:["Il a disparu","Mascotte du magasin","Roi","Vendu"],correct:1}]),
+
+C("Le Monsieur qui Marchait à l'Envers", `
+<p>Un monsieur décide de marcher à l'envers. Son voisin : « Pourquoi ? » « Pour voir si le monde est plus beau dans l'autre sens. »</p>
+<p>Il tombe dans un buisson et crie : « Le monde est pareil, juste plus piquant ! » Depuis, il dit bonjour aux buissons. Par politesse. 🌳</p>`,
+[{q:"Comment marche le monsieur ?",options:["À cloche-pied","À l'envers","En dansant","En courant"],correct:1},
+ {q:"Que dit-il après sa chute ?",options:["Le monde est beau","Le monde est piquant","Le monde est grand","Le monde est faux"],correct:1}]),
+ 
+ C("Le Poisson qui Avait Oublié de Nager", `
+<p>Un poisson se réveille et... coule. « Je ne sais plus nager ! » Un vieux poisson : « Remue la queue ! » Le poisson nage dans le mauvais sens et arrive dans un évier.</p>
+<p>Le monsieur : « Tiens, un poisson ! » Le poisson : « Bonjour, je suis perdu. Vous avez du wifi ? » 📶</p>`,
+[{q:"Que fait le poisson ce matin ?",options:["Il nage bien","Il oublie de nager","Il chante","Il mange"],correct:1},
+ {q:"Que demande-t-il au monsieur ?",options:["À manger","Du wifi","De l'eau","Un lit"],correct:1}]),
+
+C("Le Parapluie Jaloux", `
+<p>Un parapluie en a assez. « Il me sort quand il pleut, il me range quand il fait beau. » Il décide de ne plus s'ouvrir.</p>
+<p>Le monsieur rentre trempé. Le lendemain, le parapluie s'ouvre tout seul... sur le chat. Le chat, furieux, le mord. Moralité : ne jamais être jaloux d'un chat. ☔</p>`,
+[{q:"Pourquoi le parapluie est jaloux ?",options:["Il veut sortir plus","Il veut être un chat","Il a faim","Il est cassé"],correct:0},
+ {q:"Sur qui s'ouvre-t-il ?",options:["Le chien","Le chat","Le monsieur","La table"],correct:1}]),
+
+C("L'École des Escargots", `
+<p>Une école pour escargots ouvre. « Aujourd'hui, nous apprenons à courir ! » Le plus vieux : « Sérieux ? » « On commence par marcher, on verra. »</p>
+<p>Trois heures plus tard, un escargot a avancé de trois centimètres. « Record du monde ! » Toute la classe applaudit. L'année suivante, ils ont essayé le saut en hauteur. Aucun n'a sauté. Mais tous ont bien ri. 🐌</p>`,
+[{q:"Qu'apprennent les escargots ?",options:["À voler","À courir","À nager","À chanter"],correct:1},
+ {q:"Combien de centimètres avance l'escargot ?",options:["1","3","10","100"],correct:1}]),
+
+C("Le Fantôme Timide", `
+<p>Un fantôme voulait faire peur mais bafouillait : « B-b-bouh ! » Personne n'avait peur.</p>
+<p>Il décida de raconter une blague : « Pourquoi les fantômes ne mentent-ils jamais ? Parce qu'on voit à travers eux ! » L'enfant éclata de rire. Le fantôme aussi. Depuis, il anime des soirées d'humour. 👻</p>`,
+[{q:"Que fait le fantôme au lieu de faire peur ?",options:["Il chante","Il raconte des blagues","Il dort","Il mange"],correct:1},
+ {q:"Pourquoi les fantômes ne mentent pas ?",options:["Ils sont gentils","On voit à travers eux","Ils ont peur","Ils sont timides"],correct:1}]),
+
+C("Le Roi qui Détestait les Couronnes", `
+<p>Un roi déteste sa couronne : elle gratte. Il met un chapeau de paille. Les ministres sont horrifiés.</p>
+<p>Il reçoit des ambassadeurs en chapeau de paille. Ils trouvent cela charmant. Le royaume devient célèbre pour ses chapeaux. Le roi est très heureux. 👑</p>`,
+[{q:"Que déteste le roi ?",options:["Les chapeaux","Sa couronne","Les ministres","Les ambassadeurs"],correct:1},
+ {q:"Que porte-t-il à la place ?",options:["Un casque","Un chapeau de paille","Une casquette","Rien"],correct:1}]),
+
+C("La Tortue Pressée", `
+<p>Une tortue décide d'être rapide. Elle s'entraîne, sue, court. Le jour de la course, elle part comme une flèche... et arrive dernière : elle a oublié de tourner à gauche.</p>
+<p>Le lièvre, qui attendait pour rigoler, s'étouffe de rire. Résultat : un escargot qui passait tranquillement remporte la médaille. « Je ne courais pas, je me promenais. » 🐢</p>`,
+[{q:"Que décide la tortue ?",options:["De dormir","D'être rapide","De nager","De chanter"],correct:1},
+ {q:"Qui gagne la course ?",options:["La tortue","Le lièvre","Un escargot","Personne"],correct:2}]),
+
+C("Le Miroir Bavard", `
+<p>Un miroir se met à parler. « Bonjour ! Tu as une belle tête aujourd'hui ! »</p>
+<p>La dame sursaute. Le miroir continue : « Mais tu devrais sourire plus. » Elle rit. Depuis, elle discute avec son miroir chaque matin. 🪞</p>`,
+[{q:"Que fait le miroir ?",options:["Il chante","Il parle","Il danse","Il brille"],correct:1},
+ {q:"Que conseille-t-il ?",options:["De dormir","De sourire plus","De manger","De partir"],correct:1}]),
+
+C("Le Chat qui Commandait un Chien", `
+<p>Un chat ordonne à un chien : « Apporte-moi mes croquettes ! » Le chien obéit. Puis : « Gratte-moi le dos ! » Le chien gratte.</p>
+<p>Puis : « Va me chercher de l'eau ! » Le chien part... et ramène un seau. Le chat tombe dedans. Depuis, il ne commande plus. 🐶</p>`,
+[{q:"Qui commande ?",options:["Le chien","Le chat","Le fermier","L'enfant"],correct:1},
+ {q:"Que ramène le chien ?",options:["Une balle","Un seau d'eau","Un os","Rien"],correct:1}]),
+
+C("Le Voleur d'Anniversaires", `
+<p>Un homme vole les anniversaires des autres. « Pourquoi ? » « Pour avoir plus de gâteaux ! »</p>
+<p>Un jour, il tombe sur une grand-mère qui lui offre un gâteau. « Prends, mais viens le manger avec moi. » Depuis, il organise les anniversaires au lieu de les voler. 🎂</p>`,
+[{q:"Que vole l'homme ?",options:["Des gâteaux","Les anniversaires","Des cadeaux","De l'argent"],correct:1},
+ {q:"Que fait-il à la fin ?",options:["Il continue","Il organise les anniversaires","Il pleure","Il part"],correct:1}]),
+
+C("Le Chien qui Aboyait en Chinois", `
+<p>Un chien aboie en chinois. « Wou wou ! » Personne ne comprend. Une petite fille : « Il dit bonjour ! »</p>
+<p>Tout le monde apprend le chinois. Le chien, vexé, se met à aboyer en français. Personne ne le comprend plus. 🐕</p>`,
+[{q:"En quelle langue aboie le chien ?",options:["Français","Chinois","Anglais","Espagnol"],correct:1},
+ {q:"Que fait-il ensuite ?",options:["Il se tait","Il aboie en français","Il part","Il dort"],correct:1}]),
+
+C("Le Pot de Confiture Magique", `
+<p>Un pot de confiture ne se vide jamais. Le monsieur en mange matin, midi, soir.</p>
+<p>Un jour, il se transforme en pot de confiture ! Sa femme rit : « Au moins, tu seras utile au petit-déjeuner ! » Depuis, il est devenu une légende. 🍓</p>`,
+[{q:"Que fait le pot ?",options:["Il se vide","Il ne se vide jamais","Il parle","Il chante"],correct:1},
+ {q:"En quoi se transforme le monsieur ?",options:["En pain","En pot de confiture","En chat","En oiseau"],correct:1}]),
+
+C("La Sorcière qui Avait Peur du Balai", `
+<p>Une sorcière a peur de son balai. « Il vole trop vite ! » Elle décide de marcher. Le balai la suit partout.</p>
+<p>Elle finit par l'apprivoiser. Un jour, elle le prend pour sauver un chat coincé dans un arbre. Depuis, elle vole... lentement. 🧹</p>`,
+[{q:"De quoi a peur la sorcière ?",options:["Des chats","De son balai","Du noir","De l'eau"],correct:1},
+ {q:"Comment sauve-t-elle le chat ?",options:["En marchant","En volant lentement","En criant","En appelant"],correct:1}]),
+
+C("Le Crocodile Végétarien", `
+<p>Un crocodile ne mange que des salades. Les autres crocodiles se moquent.</p>
+<p>Un jour, il sauve un poisson coincé et devient ami avec lui. Le poisson lui offre une salade. Depuis, tous les crocodiles essaient la salade. 🥗</p>`,
+[{q:"Que mange le crocodile ?",options:["De la viande","Des salades","Des poissons","Des fruits"],correct:1},
+ {q:"Que font les autres crocodiles ?",options:["Ils rient","Ils essaient la salade","Ils partent","Ils dorment"],correct:1}]),
+
+C("La Grenouille qui Voulait Chanter", `
+<p>Une grenouille veut chanter comme un rossignol. Elle s'entraîne. Résultat : « Croa croa croa ! »</p>
+<p>Elle est triste. Un vieux rossignol lui dit : « Chante comme une grenouille. » Elle chante. Toute la mare l'applaudit. Depuis, elle est la star des marais. 🐸</p>`,
+[{q:"Que veut faire la grenouille ?",options:["Sauter","Chanter comme un rossignol","Nager","Manger"],correct:1},
+ {q:"Que lui conseille le rossignol ?",options:["D'arrêter","De chanter comme une grenouille","De partir","De dormir"],correct:1}]),
+
+C("Le Chapeau qui Parlait", `
+<p>Un chapeau parle. « Mets-moi ! Mets-moi ! » Le monsieur le met. Le chapeau : « Tu es beau ! »</p>
+<p>Le monsieur rougit. Depuis, il porte ce chapeau partout. Les gens sourient. Le chapeau ne parle plus... sauf les jours de pluie. 🎩</p>`,
+[{q:"Que fait le chapeau ?",options:["Il vole","Il parle","Il chante","Il mange"],correct:1},
+ {q:"Quand parle-t-il après ?",options:["Les jours de soleil","Les jours de pluie","La nuit","Jamais"],correct:1}])
+];
+
+/* ---------- SORCIER (20) ---------- */
+MODELES.sorcier = [
+C("L'École des Petits Sorciers", `
+<p>Une école de magie dans les nuages. {nom} y entre.</p>
+<p>Premier cours : il fait exploser un chaudron. Pouf ! Des grenouilles partout. Le professeur : « Bienvenue, vous avez du talent. »</p>
+<p>{nom} découvre qu'il parle aux dragons. Il calme un bébé dragon. Depuis, il est le plus jeune diplômé. 🐉</p>`,
+[{q:"Que fait exploser {nom} ?",options:["Une baguette","Un chaudron","Un livre","Un balai"],correct:1},
+ {q:"À qui parle-t-il ?",options:["Aux chats","Aux dragons","Aux rois","Aux fées"],correct:1}]),
+
+C("La Potion de Rire", `
+<p>Une potion fait rire pendant une heure. {nom} la teste par erreur.</p>
+<p>Il rit, rit, rit. Le professeur le poursuit. Le roi aussi rit. Toute l'école est en fou rire.</p>
+<p>Depuis, la potion est interdite... mais {nom} en garde une fiole. 😄</p>`,
+[{q:"Que fait la potion ?",options:["Dormir","Rire","Pleurer","Chanter"],correct:1},
+ {q:"Que fait toute l'école ?",options:["Elle dort","Elle rit","Elle chante","Elle court"],correct:1}]),
+
+C("Le Balai Volant Capricieux", `
+<p>Un balai vole seulement quand on lui parle gentiment. {nom} apprend.</p>
+<p>Il décide de l'appeler « Plume ». Le balai décolle. Ensemble, ils volent au-dessus du château.</p>
+<p>Depuis, ils sont inséparables. 🧹</p>`,
+[{q:"Comment vole le balai ?",options:["En criant","Quand on lui parle gentiment","En chantant","Jamais"],correct:1},
+ {q:"Quel nom lui donne {nom} ?",options:["Éclair","Plume","Vent","Magie"],correct:1}]),
+
+C("Le Miroir Magique", `
+<p>Un miroir montre l'avenir. {nom} y voit un roi sage.</p>
+<p>Mais le miroir ajoute : « Rien n'est écrit. » {nom} décide d'écrire sa vie.</p>
+<p>Il devient un grand sorcier. 🪞</p>`,
+[{q:"Que montre le miroir ?",options:["Le passé","L'avenir","Le présent","Rien"],correct:1},
+ {q:"Que décide {nom} ?",options:["De dormir","D'écrire sa vie","De partir","De pleurer"],correct:1}]),
+
+C("La Baguette Cassée", `
+<p>La baguette de {nom} se casse. Il est désespéré.</p>
+<p>Un vieux sorcier lui donne une branche. « La magie est en toi, pas dans le bois. » {nom} essaie. Ça marche !</p>
+<p>Depuis, il croit en lui. ✨</p>`,
+[{q:"Que casse {nom} ?",options:["Son balai","Sa baguette","Son chapeau","Son livre"],correct:1},
+ {q:"Où est la magie ?",options:["Dans le bois","En lui","Dans le ciel","Dans les livres"],correct:1}]),
+
+C("Le Chaudron Bavard", `
+<p>Un chaudron parle sans arrêt. « Remue-moi ! Ajoute du sel ! » {nom} devient fou.</p>
+<p>Il finit par l'ignorer. Le chaudron se tait. Depuis, il ne parle plus que quand on lui demande. 🍲</p>`,
+[{q:"Que fait le chaudron ?",options:["Il dort","Il parle","Il chante","Il vole"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il l'ignore","Il le casse","Il le vend","Il pleure"],correct:0}]),
+
+C("La Cape Invisible", `
+<p>Une cape rend invisible. {nom} enfile.</p>
+<p>Il fait des farces. Un jour, il aide un enfant perdu en le guidant invisiblement. Depuis, il utilise la cape pour le bien. 🦸</p>`,
+[{q:"Que rend la cape ?",options:["Grand","Invisible","Petit","Riche"],correct:1},
+ {q:"Que fait {nom} avec ?",options:["Des farces puis du bien","Rien","Du mal","De la magie noire"],correct:0}]),
+
+C("Le Phénix Apprivoisé", `
+<p>Un phénix renaît de ses cendres. {nom} l'apprivoise.</p>
+<p>Il apprend que le phénix pleure des larmes qui guérissent. Ensemble, ils soignent les malades.</p>
+<p>Depuis, {nom} est aimé de tous. 🔥</p>`,
+[{q:"Que fait le phénix ?",options:["Il meurt et renaît","Il chante","Il vole","Il dort"],correct:0},
+ {q:"Que font ses larmes ?",options:["Elles brûlent","Elles guérissent","Elles rendent riche","Elles endorment"],correct:1}]),
+
+C("La Salle des Étoiles", `
+<p>Une salle où les étoiles dansent. {nom} y entre.</p>
+<p>Il attrape une étoile. Elle devient son amie. Ensemble, ils illuminent la nuit.</p>
+<p>Depuis, le ciel est plus beau. ⭐</p>`,
+[{q:"Que font les étoiles ?",options:["Elles dorment","Elles dansent","Elles parlent","Elles mangent"],correct:1},
+ {q:"Que devient l'étoile ?",options:["Un ennemi","Une amie","Un roi","Un trésor"],correct:1}]),
+
+C("Le Sortilège de l'Amitié", `
+<p>Un sort lie deux personnes pour la vie. {nom} le lance par erreur sur lui et un autre.</p>
+<p>Ils doivent rester ensemble. Au début, c'est gênant. Puis ils deviennent amis.</p>
+<p>Depuis, ils sont inséparables. 💫</p>`,
+[{q:"Que fait le sort ?",options:["Il endort","Il lie deux personnes","Il rend riche","Il rend invisible"],correct:1},
+ {q:"Que deviennent-ils ?",options:["Ennemis","Amis","Rois","Sorciers"],correct:1}]),
+
+C("Le Grimoire qui Chante", `
+<p>Un grimoire chante des sorts. {nom} l'ouvre.</p>
+<p>Il apprend un sort pour faire pousser les fleurs. Il transforme sa chambre en jardin.</p>
+<p>Depuis, il cultive partout. 🌸</p>`,
+[{q:"Que fait le grimoire ?",options:["Il dort","Il chante","Il mange","Il vole"],correct:1},
+ {q:"Que fait pousser {nom} ?",options:["Des arbres","Des fleurs","Des légumes","Des champignons"],correct:1}]),
+
+C("La Potion d'Invisibilité", `
+<p>{nom} boit une potion d'invisibilité par erreur.</p>
+<p>Il doit attendre 3 heures. Il en profite pour observer les autres. Il comprend qu'être vu, c'est important.</p>
+<p>Depuis, il apprécie les autres. 👻</p>`,
+[{q:"Que fait la potion ?",options:["Elle rend invisible","Elle endort","Elle rend fort","Elle rend riche"],correct:0},
+ {q:"Combien de temps dure l'effet ?",options:["1h","2h","3h","Toute la vie"],correct:2}]),
+
+C("Le Château des Mille Sorts", `
+<p>Un château teste les sorciers. {nom} y entre.</p>
+<p>Il doit résoudre trois énigmes. Grâce à sa bonté, il réussit. Le château l'accueille.</p>
+<p>Depuis, il y vit avec d'autres sorciers. 🏰</p>`,
+[{q:"Combien d'énigmes ?",options:["Deux","Trois","Quatre","Cinq"],correct:1},
+ {q:"Que gagne {nom} ?",options:["De l'or","Un logement au château","Une épée","Un livre"],correct:1}]),
+
+C("La Fée Marraine Maladroite", `
+<p>Une fée marraine offre un don à {nom}. Mais elle se trompe de formule.</p>
+<p>Résultat : {nom} éternue des paillettes. Au début, il est gêné. Puis il devient célèbre.</p>
+<p>Depuis, il fait des spectacles. ✨</p>`,
+[{q:"Que fait la fée ?",options:["Elle chante","Elle se trompe","Elle dort","Elle mange"],correct:1},
+ {q:"Que fait {nom} en éternuant ?",options:["Du feu","Des paillettes","De l'eau","Des fleurs"],correct:1}]),
+
+C("Le Dragon de Compagnie", `
+<p>Un petit dragon suit {nom} partout. Il mange tout.</p>
+<p>{nom} lui apprend à manger seulement des légumes. Le dragon devient le meilleur ami du village.</p>
+<p>Depuis, ils sont inséparables. 🐉</p>`,
+[{q:"Que mange le dragon au début ?",options:["Des légumes","Tout","Des cailloux","Rien"],correct:1},
+ {q:"Que lui apprend {nom} ?",options:["À voler","À manger des légumes","À chanter","À dormir"],correct:1}]),
+
+C("Le Miroir qui Répond", `
+<p>Un miroir répond aux questions. {nom} lui demande conseil.</p>
+<p>Le miroir lui dit : « Écoute ton cœur. » {nom} suit ce conseil et devient heureux.</p>
+<p>Depuis, il consulte son cœur avant le miroir. 🪞</p>`,
+[{q:"Que fait le miroir ?",options:["Il chante","Il répond","Il mange","Il vole"],correct:1},
+ {q:"Que conseille-t-il ?",options:["Dormir","Écouter son cœur","Manger","Partir"],correct:1}]),
+
+C("La Plume Magique", `
+<p>Une plume écrit toute seule. {nom} l'utilise pour faire ses devoirs.</p>
+<p>Mais la plume écrit la vérité : « Je n'ai pas envie de faire ça. » {nom} rit et décide de faire ses devoirs lui-même.</p>
+<p>Depuis, il est le premier de sa classe. 🪶</p>`,
+[{q:"Que fait la plume ?",options:["Elle vole","Elle écrit seule","Elle parle","Elle chante"],correct:1},
+ {q:"Que décide {nom} ?",options:["Il continue à tricher","Il fait ses devoirs","Il jette la plume","Il dort"],correct:1}]),
+
+C("Le Sort du Rire Éternel", `
+<p>Un sort fait rire sans arrêt. {nom} le lance sur son ennemi.</p>
+<p>Mais il se trompe et le lance sur lui-même. Il rit pendant une semaine. Il devient le plus joyeux des sorciers.</p>
+<p>Depuis, il rit chaque jour. 😂</p>`,
+[{q:"Sur qui est lancé le sort ?",options:["Son ennemi","Lui-même","Un chat","Un roi"],correct:1},
+ {q:"Combien de temps rit-il ?",options:["Un jour","Une semaine","Un mois","Toujours"],correct:1}]),
+
+C("La Souris Magicienne", `
+<p>Une souris se révèle être une magicienne. {nom} la rencontre.</p>
+<p>Elle transforme les objets en fromage. {nom} doit éviter qu'elle touche la lune.</p>
+<p>Depuis, ils voyagent ensemble. 🐭</p>`,
+[{q:"Quel animal est magicien ?",options:["Un chat","Une souris","Un chien","Un oiseau"],correct:1},
+ {q:"En quoi transforme-t-elle les objets ?",options:["En or","En fromage","En eau","En fleurs"],correct:1}]),
+
+C("Le Ciel Étoilé dans une Boîte", `
+<p>Une boîte contient un ciel étoilé. {nom} l'ouvre.</p>
+<p>Le ciel se répand dans sa chambre. Il peut dormir sous les étoiles chaque nuit.</p>
+<p>Depuis, il rêve mieux. 🌌</p>`,
+[{q:"Que contient la boîte ?",options:["De l'or","Un ciel étoilé","Un dragon","Un livre"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il la referme","Il dort sous les étoiles","Il la jette","Il la vend"],correct:1}])
+];
+
+/* ---------- FAMILLE (20) ---------- */
+MODELES.famille = [
+C("La Recette Perdue", `
+<p>La grand-mère a perdu sa recette de gâteau. Toute la famille cherche.</p>
+<p>Le petit frère fouille sous les coussins. La tante au grenier. Rien.</p>
+<p>Finalement, la recette était dans le livre de la plus jeune — utilisée comme marque-page. Toute la famille rit et prépare le gâteau. 🍰</p>`,
+[{q:"Qui a perdu la recette ?",options:["La mère","La grand-mère","Le père","L'enfant"],correct:1},
+ {q:"Où était la recette ?",options:["Dans le grenier","Dans un livre","Sous le canapé","Dans la cuisine"],correct:1}]),
+
+C("Le Grand-Père Conteur", `
+<p>Chaque soir, le grand-père raconte une histoire. {nom} adore.</p>
+<p>Un jour, le grand-père perd la mémoire. {nom} décide de raconter à son tour.</p>
+<p>Depuis, il raconte chaque soir. Le grand-père sourit. 📖</p>`,
+[{q:"Que fait le grand-père chaque soir ?",options:["Il dort","Il raconte des histoires","Il chante","Il lit"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il part","Il raconte à son tour","Il pleure","Il dort"],correct:1}]),
+
+C("La Petite Sœur Intrépide", `
+<p>La petite sœur de {nom} n'a peur de rien. Elle grimpe partout.</p>
+<p>Un jour, elle monte sur le toit. {nom} la rejoint et la rassure. Ensemble, ils redescendent.</p>
+<p>Depuis, ils sont inséparables. 🏠</p>`,
+[{q:"De quoi n'a pas peur la sœur ?",options:["De l'eau","De rien","Du noir","Des chiens"],correct:1},
+ {q:"Où monte-t-elle ?",options:["Sur un arbre","Sur le toit","Sur une montagne","Dans un bus"],correct:1}]),
+
+C("Le Repas du Dimanche", `
+<p>Chaque dimanche, la famille se réunit. {nom} prépare un dessert.</p>
+<p>Il rate la recette. La famille mange quand même. Tout le monde rit.</p>
+<p>Depuis, {nom} cuisine chaque dimanche — mieux. 🍪</p>`,
+[{q:"Quand se réunit la famille ?",options:["Lundi","Dimanche","Samedi","Mardi"],correct:1},
+ {q:"Que prépare {nom} ?",options:["Un plat","Un dessert","Une boisson","Rien"],correct:1}]),
+
+C("Le Frère Jumeau", `
+<p>{nom} a un jumeau. Ils se ressemblent tant qu'on les confond.</p>
+<p>Un jour, ils échangent leurs places à l'école. Le professeur ne voit rien.</p>
+<p>Depuis, ils font des blagues ensemble. 👯</p>`,
+[{q:"Comment sont les jumeaux ?",options:["Différents","Identiques","Grands","Petits"],correct:1},
+ {q:"Que font-ils à l'école ?",options:["Ils échangent leurs places","Ils dorment","Ils jouent","Ils mangent"],correct:0}]),
+
+C("La Tante Voyageuse", `
+<p>La tante de {nom} voyage partout. Elle rapporte toujours un cadeau.</p>
+<p>Un jour, elle rapporte une graine étrange. {nom} la plante. Une fleur magnifique pousse.</p>
+<p>Depuis, il attend chaque retour. 🌺</p>`,
+[{q:"Que fait la tante ?",options:["Elle dort","Elle voyage","Elle cuisine","Elle chante"],correct:1},
+ {q:"Que rapporte-t-elle ?",options:["De l'or","Une graine","Un livre","Un chat"],correct:1}]),
+
+C("Le Papa Blagueur", `
+<p>Le papa de {nom} fait des blagues toute la journée.</p>
+<p>Un jour, il en fait une si drôle que toute la famille tombe de rire. {nom} en pleure de rire.</p>
+<p>Depuis, il l'imite. 😄</p>`,
+[{q:"Que fait le papa ?",options:["Il chante","Il fait des blagues","Il dort","Il cuisine"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il pleure","Il rit","Il part","Il dort"],correct:1}]),
+
+C("La Maman Astronaute", `
+<p>La maman de {nom} rêve d'aller dans l'espace. Elle étudie chaque nuit.</p>
+<p>Un jour, elle est choisie pour une mission. {nom} est fier.</p>
+<p>Depuis, il regarde le ciel en pensant à elle. 🚀</p>`,
+[{q:"Que rêve la maman ?",options:["De voyager","D'aller dans l'espace","De chanter","De danser"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il pleure","Il regarde le ciel","Il dort","Il part"],correct:1}]),
+
+C("Le Cousin Farceur", `
+<p>Le cousin de {nom} fait des farces. Un jour, il met du sel dans le sucre.</p>
+<p>Toute la famille fait la grimace. {nom} rit. Le cousin promet d'arrêter... mais recommence.</p>
+<p>Depuis, ils font des farces ensemble. 😜</p>`,
+[{q:"Que met le cousin dans le sucre ?",options:["Du poivre","Du sel","Du sucre","De l'eau"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il pleure","Il rit","Il part","Il crie"],correct:1}]),
+
+C("Le Bébé Surprise", `
+<p>Un bébé arrive dans la famille. {nom} est jaloux au début.</p>
+<p>Puis il tient le bébé dans ses bras. Il fond. Depuis, il est le meilleur grand frère.</p>
+<p>Il raconte des histoires au bébé chaque soir. 👶</p>`,
+[{q:"Comment est {nom} au début ?",options:["Content","Jaloux","Triste","Fatigué"],correct:1},
+ {q:"Que fait-il après ?",options:["Il part","Il devient grand frère attentionné","Il dort","Il pleure"],correct:1}]),
+
+C("La Maison de Campagne", `
+<p>La famille de {nom} a une maison à la campagne.</p>
+<p>Chaque été, ils y vont. {nom} y attrape des papillons, cueille des fleurs.</p>
+<p>Depuis, il attend l'été chaque année. 🌼</p>`,
+[{q:"Où est la maison ?",options:["En ville","À la campagne","À la mer","À la montagne"],correct:1},
+ {q:"Quand y vont-ils ?",options:["En hiver","En été","Au printemps","En automne"],correct:1}]),
+
+C("Le Chien de la Famille", `
+<p>Un chien vit avec la famille. Il fait des bêtises.</p>
+<p>Un jour, il mange les chaussons du papa. {nom} le défend. Le papa rit.</p>
+<p>Depuis, le chien est le roi de la maison. 🐶</p>`,
+[{q:"Qu'a mangé le chien ?",options:["Un os","Les chaussons","Un gâteau","Une chaussette"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il gronde","Il défend le chien","Il rit","Il part"],correct:1}]),
+
+C("La Surprise d'Anniversaire", `
+<p>C'est l'anniversaire de la maman. {nom} prépare une surprise.</p>
+<p>Avec toute la famille, il décore la maison. Quand la maman rentre, elle pleure de joie.</p>
+<p>Depuis, ils font une surprise chaque année. 🎉</p>`,
+[{q:"Pour qui est la surprise ?",options:["Le papa","La maman","Le frère","La sœur"],correct:1},
+ {q:"Que fait la maman ?",options:["Elle crie","Elle pleure de joie","Elle part","Elle dort"],correct:1}]),
+
+C("Le Voyage en Famille", `
+<p>La famille part en vacances. Le voyage est long.</p>
+<p>{nom} chante dans la voiture. Tout le monde chante. Ils arrivent à la mer.</p>
+<p>Depuis, ils chantent à chaque voyage. 🚗</p>`,
+[{q:"Où va la famille ?",options:["À la montagne","À la mer","En ville","À la campagne"],correct:1},
+ {q:"Que fait {nom} dans la voiture ?",options:["Il dort","Il chante","Il pleure","Il mange"],correct:1}]),
+
+C("Le Secret de la Grand-Mère", `
+<p>La grand-mère cache un secret. {nom} le découvre : elle a été danseuse.</p>
+<p>Il lui demande de danser. Elle accepte. Toute la famille applaudit.</p>
+<p>Depuis, elle danse à chaque fête. 💃</p>`,
+[{q:"Qu'a été la grand-mère ?",options:["Cuisinière","Danseuse","Chanteuse","Prof"],correct:1},
+ {q:"Que fait la famille ?",options:["Elle rit","Elle applaudit","Elle part","Elle dort"],correct:1}]),
+
+C("Le Petit Frère Perdu", `
+<p>Le petit frère de {nom} se perd au marché. {nom} panique.</p>
+<p>Il le cherche partout. Il le trouve près d'un marchand de bonbons.</p>
+<p>Depuis, il le tient par la main. 🤝</p>`,
+[{q:"Où se perd le frère ?",options:["À l'école","Au marché","À la maison","Au parc"],correct:1},
+ {q:"Où le retrouve {nom} ?",options:["Chez lui","Près des bonbons","À la mairie","Dans un arbre"],correct:1}]),
+
+C("La Fête des Mères", `
+<p>C'est la fête des mères. {nom} prépare un poème.</p>
+<p>Il le lit devant toute la famille. Sa mère pleure de joie.</p>
+<p>Depuis, il écrit un poème chaque année. 📝</p>`,
+[{q:"Quelle fête ?",options:["Noël","Fête des mères","Pâques","Anniversaire"],correct:1},
+ {q:"Que prépare {nom} ?",options:["Un gâteau","Un poème","Une chanson","Un dessin"],correct:1}]),
+
+C("La Dispute des Parents", `
+<p>Les parents de {nom} se disputent. Il a peur.</p>
+<p>Il leur écrit une lettre. Ils la lisent, pleurent et se réconcilient.</p>
+<p>Depuis, ils parlent calmement. ✉️</p>`,
+[{q:"Que font les parents ?",options:["Ils rient","Ils se disputent","Ils chantent","Ils dorment"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il crie","Il écrit une lettre","Il part","Il pleure"],correct:1}]),
+
+C("Le Retour du Grand Frère", `
+<p>Le grand frère de {nom} était parti loin. Un jour, il revient.</p>
+<p>{nom} lui saute dans les bras. Toute la famille fait la fête.</p>
+<p>Depuis, ils ne se quittent plus. 🤗</p>`,
+[{q:"D'où revient le frère ?",options:["De l'école","De loin","Du marché","Du travail"],correct:1},
+ {q:"Que fait {nom} ?",options:["Il pleure","Il lui saute dans les bras","Il part","Il crie"],correct:1}]),
+
+C("Le Déménagement", `
+<p>La famille de {nom} déménage. Il est triste de quitter ses amis.</p>
+<p>Dans la nouvelle maison, il se fait vite des amis. Il découvre un jardin magnifique.</p>
+<p>Depuis, il est heureux. 🏡</p>`,
+[{q:"Que fait la famille ?",options:["Elle voyage","Elle déménage","Elle chante","Elle danse"],correct:1},
+ {q:"Comment se sent {nom} après ?",options:["Triste","Heureux","En colère","Fatigué"],correct:1}])
+];
+
+/* ============================================================
+   3. LOGIQUE APPLICATION
+============================================================ */
+const CATEGORIES = [
+  {id:"aventure",nom:"Contes d'Aventure",icon:"⚔️",desc:"Héros courageux et trésors cachés."},
+  {id:"foret",nom:"Contes de la Forêt",icon:"🌲",desc:"Créatures mystérieuses et arbres qui parlent."},
+  {id:"ville",nom:"Contes de la Ville",icon:"🏙️",desc:"Lumières et mystères au cœur du béton."},
+  {id:"village",nom:"Contes du Village",icon:"🏡",desc:"Traditions et histoires au coin du feu."},
+  {id:"marin",nom:"Contes de la Mer",icon:"⛵",desc:"Marins intrépides, sirènes et tempêtes."},
+  {id:"drole",nom:"Contes Drôles",icon:"😂",desc:"Pour rire aux larmes !"},
+  {id:"sorcier",nom:"Contes de Sorciers",icon:"🧙‍♂️",desc:"Potions et écoles de sorcellerie."},
+  {id:"famille",nom:"Contes de Famille",icon:"👨‍👩‍👧‍👦",desc:"Histoires tendres et touchantes."}
+];
+
+const NOMS_CATEGORIES_EN={
+ aventure:["Adventure Stories","Brave heroes and hidden treasures."],foret:["Forest Stories","Mysterious creatures and talking trees."],
+ ville:["City Stories","Lights and mysteries in the city."],village:["Village Stories","Traditions and fireside tales."],
+ marin:["Sea Stories","Brave sailors, mermaids and storms."],drole:["Funny Stories","Stories to make you laugh!"],
+ sorcier:["Wizard Stories","Potions and schools of magic."],famille:["Family Stories","Tender and touching tales."]
+};
+function changerLangue(langue){ecrireStockage("cm-langue",langue);appliquerLangue(langue)}
+function appliquerLangue(langue){
+ const en=langue==="en",t={settings:en?"⚙️ Settings":"⚙️ Paramètres",favorites:en?"⭐ My favorites":"⭐ Mes favoris",progress:en?"📊 Progress":"📊 Progression",profile:en?"👤 Profile":"👤 Profil"};
+ const b=document.querySelectorAll(".top-bar button");if(b.length>=4){b[0].textContent=t.settings;b[1].textContent=t.favorites;b[2].textContent=t.progress;b[3].textContent=t.profile}
+ const sub=document.querySelector("header p");if(sub)sub.textContent=en?"A journey through worlds of imagination":"Un voyage à travers les mondes de l'imaginaire";
+ document.getElementById("lang-fr")?.classList.toggle("active",!en);document.getElementById("lang-en")?.classList.toggle("active",en);renderCategories();
+}
+
+function renderCategories(){
+  const grid = document.getElementById("categories");
+  grid.innerHTML = CATEGORIES.map(c=>`
+    <article class="category-card ${c.id}" data-category="${c.id}" onclick="ouvrirListe('${c.id}')">
+      <span class="icon">${c.icon}</span>
+      <h2>${c.nom}</h2>
+      <p>${c.desc}</p>
+      <span class="count">${MODELES[c.id].length} contes</span>
+    </article>
+  `).join("");
+}
+
+/* ============================================================
+   4. LISTE CONTES D'UNE CATÉGORIE
+============================================================ */
+let categorieActuelle = null;
+
+function ouvrirListe(cat){
+  categorieActuelle = cat;
+  const catInfo = CATEGORIES.find(c=>c.id===cat);
+  document.getElementById("list-title").textContent = catInfo.icon+" "+catInfo.nom;
+  const list = document.getElementById("conte-list");
+  const progress = JSON.parse(lireStockage("cm-progress")||"{}");
+
+  list.innerHTML = MODELES[cat].map((c,i)=>{
+    const lu = progress[`${cat}-${i}`];
+    return `<div class="conte-item" onclick="ouvrirConte('${cat}',${i})">
+      <span class="titre">${c.titre}</span>
+      <span class="badge">${lu?"✅ Lu":"📖 Lire"}</span>
+    </div>`;
+  }).join("");
+
+  document.getElementById("list-modal").classList.add("active");
+}
+
+function fermerListe(){ document.getElementById("list-modal").classList.remove("active"); }
+
+/* ============================================================
+   5. LECTURE D'UN CONTE
+============================================================ */
+let conteActuel = null;
+let quizEnCours = false;
+let indexActuel = -1;
+
+function ouvrirConte(cat, index){
+  fermerListe();
+  conteActuel = cat;
+  indexActuel = index;
+  const conte = MODELES[cat][index];
+
+  document.getElementById("story-title").textContent = conte.titre;
+  document.getElementById("story-illustration").innerHTML = SVG[cat]||SVG.aventure;
+  document.getElementById("story-body").innerHTML = personnaliser(conte.texte) + `<p class="extra-paragraph">${({
+aventure:"Avant de rentrer, {nom} prit le temps de regarder le chemin parcouru. Chaque rencontre lui avait appris à écouter avant de juger, à rester courageux devant l'inconnu et à tenir ses promesses. De retour au village, il raconta son aventure et partagea ce qu'il avait appris. Les habitants gardèrent longtemps cette histoire en mémoire.",
+foret:"Les jours suivants, {nom} revint dans la forêt pour observer les animaux et prendre soin des plantes. Il apprit à reconnaître les chants des oiseaux et à respecter même les plus petites créatures. Peu à peu, les habitants comprirent qu'ils devaient protéger ensemble ce lieu précieux.",
+ville:"Après cette aventure, {nom} raconta ce qui s'était passé aux voisins. Plusieurs personnes décidèrent de participer et, ensemble, elles améliorèrent leur quartier. Les passants s'arrêtaient désormais pour se parler et s'entraider. {nom} comprit qu'un petit geste peut inspirer toute une communauté.",
+village:"Le soir, les anciens réunirent les habitants autour du feu pour écouter le récit de {nom}. Chacun partagea un souvenir et une leçon apprise au fil des années. Les enfants promirent de garder cette histoire vivante et de transmettre ses valeurs aux générations suivantes.",
+marin:"Lorsque la mer retrouva son calme, {nom} observa l'horizon et remercia ses compagnons. Ils réparèrent ensemble leur embarcation et partagèrent leurs provisions. Depuis ce jour, ils naviguèrent avec davantage de prudence, de solidarité et de respect pour l'océan.",
+drole:"Quand l'histoire fut racontée au reste du village, chacun ajouta un détail encore plus drôle. Les rires se prolongèrent jusqu'au soir et les petites querelles furent oubliées. {nom} découvrit qu'un peu d'humour accompagné de gentillesse peut rapprocher les gens.",
+sorcier:"Avant de partir, {nom} nota soigneusement ce qu'il avait appris dans son carnet. Il comprit que la magie demande de la patience, de la responsabilité et de la bienveillance. Il promit d'utiliser ses connaissances pour aider les autres et non pour leur nuire.",
+famille:"Plus tard, la famille se retrouva pour partager un repas et reparler de cette journée. Chacun expliqua ce qu'il avait ressenti et ce qu'il souhaitait améliorer. Ils décidèrent de s'écouter davantage et de s'entraider, même lorsque les journées seraient difficiles."
+})[cat]||" {nom} garda cette aventure en mémoire et en partagea la leçon avec ceux qu'il aimait."}</p>`.replace(/\\{nom\\}/g,utilisateur.nom);
+  document.getElementById("quiz-container").innerHTML = "";
+
+  const btnQuiz = document.getElementById("btn-quiz");
+  btnQuiz.style.display = conte.quiz?"inline-block":"none";
+  btnQuiz.textContent = "🎯 Jouer au quiz";
+  quizEnCours = false;
+
+  // Favori
+  const favs = JSON.parse(lireStockage("cm-favs")||"[]");
+  const favBtn = document.getElementById("btn-fav");
+  const key = `${cat}-${index}`;
+  favBtn.textContent = favs.includes(key)?"⭐ Retirer favori":"⭐ Favori";
+
+  // Marquer comme lu
+  marquerLu(cat, index);
+
+  document.getElementById("story-modal").classList.add("active");
+}
+
+function closeStory(){
+  document.getElementById("story-modal").classList.remove("active");
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
+function retourDepuisConte(){
+  closeStory();
+  if(categorieActuelle) ouvrirListe(categorieActuelle);
+}
+
+/* Bouton Retour Android / navigateur : revenir à l'écran précédent de l'application. */
+let cmEtatRetourActif = false;
+function cmEcranActif(){
+  return ["quiz-modal","story-modal","list-modal","fav-modal","prog-modal","settings-modal"]
+    .some(id=>{const el=document.getElementById(id);return el && (el.classList.contains("active") || (id==="settings-modal" && el.style.display==="block"));});
+}
+function cmRetour(){
+  const story=document.getElementById("story-modal");
+  const liste=document.getElementById("list-modal");
+  const fav=document.getElementById("fav-modal");
+  const prog=document.getElementById("prog-modal");
+  const settings=document.getElementById("settings-modal");
+  const quizModal=document.getElementById("quiz-modal");
+  if(quizModal.classList.contains("active")){fermerQuiz();return true;}
+  if(story.classList.contains("active")){retourDepuisConte();return true;}
+  if(liste.classList.contains("active")){fermerListe();return true;}
+  if(fav.classList.contains("active")){fav.classList.remove("active");return true;}
+  if(prog.classList.contains("active")){prog.classList.remove("active");return true;}
+  if(settings.classList.contains("active") || settings.style.display==="block"){fermerParametres();return true;}
+  return false;
+}
+window.addEventListener("popstate",()=>{
+  if(cmRetour()){history.pushState({cm:true},"");}
+});
+function cmActiverHistoriqueRetour(){
+  if(!cmEtatRetourActif){history.pushState({cm:true},"");cmEtatRetourActif=true;}
+}
+document.addEventListener("click",e=>{
+  const btn=e.target.closest(".category-card, .conte-item, #btn-fav, #btn-quiz, .top-bar button");
+  if(btn) cmActiverHistoriqueRetour();
+});
+
+function personnaliser(t){
+  let s = t.replace(/\{nom\}/g, utilisateur.nom);
+  // L'âge uniquement si présent dans le texte
+  s = s.replace(/\{age\}/g, utilisateur.age);
+  return s;
+}
+
+/* ============================================================
+   6. QUIZ
+============================================================ */
+let quizQuestionActuelle=0, quizARepondu=false;
+function lancerQuiz(){
+ const quiz=MODELES[conteActuel][indexActuel].quiz;if(!quiz)return;
+ quizEnCours=true;quizQuestionActuelle=0;quizARepondu=false;window.quizScore=0;window.quizRepondu=0;window.quizTotal=quiz.length;
+ document.getElementById("quiz-modal").classList.add("active");document.getElementById("story-modal").classList.remove("active");afficherQuestionQuiz();cmActiverHistoriqueRetour();
+}
+function afficherQuestionQuiz(){
+ const quiz=MODELES[conteActuel][indexActuel].quiz,stage=document.getElementById("quiz-stage");
+ if(quizQuestionActuelle>=quiz.length){
+  const total=quiz.length,score=window.quizScore;let msg=`Score : ${score}/${total} `;
+  if(score===total){msg+="🏆 Parfait !";jouerSon("applaudissement")}else if(score>=total/2)msg+="👏 Bien joué !";else msg+="💡 Réessayez !";
+  stage.innerHTML=`<div class="quiz-box"><h3>Résultat final</h3><p class="quiz-result">${msg}</p><button class="quiz-next" onclick="terminerQuiz()">Terminer</button></div>`;
+  const prog=JSON.parse(lireStockage("cm-scores")||"{}"),key=`${conteActuel}-${indexActuel}`;
+  if(!prog[key]||prog[key]<score){prog[key]=score;ecrireStockage("cm-scores",JSON.stringify(prog))}mettreAJourProgression();quizEnCours=false;return;
+ }
+ const q=quiz[quizQuestionActuelle];
+ stage.innerHTML=`<p class="quiz-progress">Question ${quizQuestionActuelle+1} sur ${quiz.length}</p><div class="quiz-box"><div class="quiz-question"><p>${personnaliser(q.q)}</p>${q.options.map((opt,j)=>`<button class="quiz-option" onclick="repondreQuestionQuiz(${j})">${opt}</button>`).join("")}</div><div id="quiz-feedback" class="quiz-result"></div><button id="quiz-next" class="quiz-next" style="display:none" onclick="questionQuizSuivante()">Question suivante →</button></div>`;
+ quizARepondu=false;
+}
+function repondreQuestionQuiz(optIndex){
+ if(quizARepondu)return;quizARepondu=true;
+ const q=MODELES[conteActuel][indexActuel].quiz[quizQuestionActuelle],btns=document.querySelectorAll("#quiz-stage .quiz-option");
+ btns.forEach((b,j)=>{b.disabled=true;if(j===q.correct)b.classList.add("correct")});
+ const feedback=document.getElementById("quiz-feedback");
+ if(optIndex===q.correct){window.quizScore++;feedback.textContent="✅ Bonne réponse !";jouerSon("bon")}
+ else{btns[optIndex].classList.add("wrong");feedback.textContent="❌ La bonne réponse est : "+q.options[q.correct]}
+ window.quizRepondu++;const next=document.getElementById("quiz-next");next.textContent=quizQuestionActuelle===window.quizTotal-1?"Voir le résultat":"Question suivante →";next.style.display="block";
+}
+function questionQuizSuivante(){quizQuestionActuelle++;afficherQuestionQuiz()}
+function terminerQuiz(){document.getElementById("quiz-modal").classList.remove("active");document.getElementById("story-modal").classList.add("active");document.getElementById("btn-quiz").textContent="🎯 Rejouer"}
+function fermerQuiz(){document.getElementById("quiz-modal").classList.remove("active");document.getElementById("story-modal").classList.add("active");quizEnCours=false}
+
+/* ============================================================
+   7. FAVORIS
+============================================================ */
+function toggleFavori(){
+  const key = `${conteActuel}-${indexActuel}`;
+  let favs = JSON.parse(lireStockage("cm-favs")||"[]");
+  if(favs.includes(key)){
+    favs = favs.filter(f=>f!==key);
+    document.getElementById("btn-fav").textContent = "⭐ Favori";
+    toast("Retiré des favoris");
+  } else {
+    favs.push(key);
+    document.getElementById("btn-fav").textContent = "⭐ Retirer favori";
+    toast("Ajouté aux favoris ⭐");
+  }
+  ecrireStockage("cm-favs", JSON.stringify(favs));
+}
+
+function ouvrirFavoris(){
+  const favs = JSON.parse(lireStockage("cm-favs")||"[]");
+  const list = document.getElementById("fav-list");
+  if(favs.length===0){
+    list.innerHTML = '<p style="text-align:center;color:var(--texte-doux)">Aucun favori pour le moment.</p>';
+  } else {
+    list.innerHTML = favs.map(key=>{
+      const [cat,idx] = key.split("-");
+      const c = MODELES[cat][parseInt(idx)];
+      return `<div class="conte-item" onclick="ouvrirConte('${cat}',${idx})">
+        <span class="titre">${CATEGORIES.find(x=>x.id===cat).icon} ${c.titre}</span>
+        <span class="badge">📖 Lire</span>
+      </div>`;
+    }).join("");
+  }
+  document.getElementById("fav-modal").classList.add("active");
+}
+
+/* ============================================================
+   8. PROGRESSION
+============================================================ */
+function marquerLu(cat, index){
+  const prog = JSON.parse(lireStockage("cm-progress")||"{}");
+  prog[`${cat}-${index}`] = true;
+  ecrireStockage("cm-progress", JSON.stringify(prog));
+  mettreAJourProgression();
+}
+
+function chargerProgression(){ mettreAJourProgression(); }
+
+function mettreAJourProgression(){
+  const prog = JSON.parse(lireStockage("cm-progress")||"{}");
+  const scores = JSON.parse(lireStockage("cm-scores")||"{}");
+  const favs = JSON.parse(lireStockage("cm-favs")||"[]");
+
+  const totalContes = Object.values(MODELES).reduce((s,a)=>s+a.length,0);
+  const lus = Object.keys(prog).length;
+  const quizReussis = Object.keys(scores).length;
+  const scoreTotal = Object.values(scores).reduce((s,v)=>s+v,0);
+
+  document.getElementById("stat-lus").textContent = lus;
+  document.getElementById("stat-quiz").textContent = quizReussis;
+  document.getElementById("stat-score").textContent = scoreTotal;
+  document.getElementById("stat-fav").textContent = favs.length;
+
+  const pct = totalContes? Math.round(lus/totalContes*100) : 0;
+  document.getElementById("prog-fill").style.width = pct+"%";
+  document.getElementById("prog-text").textContent = `${lus} / ${totalContes} contes lus (${pct}%)`;
+}
+
+function ouvrirProgression(){
+  mettreAJourProgression();
+  document.getElementById("prog-modal").classList.add("active");
+}
+
+/* ============================================================
+   9. SONS
+============================================================ */
+let audioCtx = null;
+function initAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+}
+function jouerSon(type){
+  initAudio();
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime;
+  if(type==="bon"){
+    [523,659,784].forEach((f,i)=>{
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.frequency.value=f; o.type="sine";
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.15,t+0.02+i*0.1);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.3+i*0.1);
+      o.start(t+i*0.1); o.stop(t+0.4+i*0.1);
+    });
+  } else if(type==="applaudissement"){
+    for(let i=0;i<30;i++){
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type="square"; o.frequency.value=200+Math.random()*1500;
+      g.gain.setValueAtTime(0.05,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.05);
+      o.start(t+Math.random()*1); o.stop(t+Math.random()*1+0.05);
+    }
+  } else if(type==="magie"){
+    [800,1200,1600].forEach((f,i)=>{
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.frequency.setValueAtTime(f,t);
+      o.frequency.exponentialRampToValueAtTime(f*2,t+0.4);
+      g.gain.setValueAtTime(0.1,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+      o.start(t+i*0.1); o.stop(t+0.5+i*0.1);
+    });
+  }
+}
+
+/* ============================================================
+   10. LECTURE VOCALE (TTS)
+============================================================ */
+function lireHistoire(){
+  if(!window.speechSynthesis){ toast("Lecture vocale non supportée"); return; }
+  window.speechSynthesis.cancel();
+  const texte = document.getElementById("story-body").innerText;
+  const u = new SpeechSynthesisUtterance(texte);
+  u.lang = (lireStockage("cm-langue")==="en"?"en-US":"fr-FR");
+  u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+  toast("🔊 Lecture en cours...");
+}
+
+/* ============================================================
+   11. EXPORT PDF / WORD
+============================================================ */
+function exporterPDF(){
+  toast("📄 Ouverture PDF — utilisez « Imprimer → Enregistrer en PDF »");
+  setTimeout(()=>window.print(), 300);
+}
+
+function exporterWord(){
+  const titre = document.getElementById("story-title").innerText;
+  const corps = document.getElementById("story-body").innerText;
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${titre}</title></head><body><h1>${titre}</h1><p>${corps.replace(/\n/g,"<br>")}</p><hr><p><em>© 2026 ConteMerveilles — Créé par KIBWE ZONGWE Israël</em></p></body></html>`;
+  const blob = new Blob(["\ufeff",html],{type:"application/msword"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = titre.replace(/[^a-z0-9]/gi,"_")+".doc";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("📝 Fichier Word téléchargé !");
+}
+
+/* ============================================================
+   12. PARAMÈTRES
+============================================================ */
+const COULEURS = [
+  {nom:"Violet",p:"#667eea",s:"#764ba2"},
+  {nom:"Rouge",p:"#e74c3c",s:"#c0392b"},
+  {nom:"Vert",p:"#27ae60",s:"#1e8449"},
+  {nom:"Bleu",p:"#3498db",s:"#2874a6"},
+  {nom:"Orange",p:"#f39c12",s:"#d68910"},
+  {nom:"Rose",p:"#e91e63",s:"#ad1457"},
+  {nom:"Turquoise",p:"#1abc9c",s:"#138d75"},
+  {nom:"Jaune",p:"#f1c40f",s:"#b7950b"},
+  {nom:"Marron",p:"#8b4513",s:"#5a2d0c"},
+  {nom:"Gris",p:"#7f8c8d",s:"#566573"}
+];
+
+function initCouleurs(){
+  const picker = document.getElementById("couleur-picker");
+  picker.innerHTML = "";
+  const saved = JSON.parse(lireStockage("cm-couleur")||"null");
+  COULEURS.forEach(c=>{
+    const sw = document.createElement("div");
+    sw.className = "color-swatch";
+    if(saved && saved.nom===c.nom) sw.classList.add("selected");
+    sw.style.background = `linear-gradient(135deg, ${c.p}, ${c.s})`;
+    sw.title = c.nom;
+    sw.onclick = ()=>appliquerCouleur(c);
+    picker.appendChild(sw);
+  });
+}
+
+function appliquerCouleur(c){
+  document.documentElement.style.setProperty("--primaire", c.p);
+  document.documentElement.style.setProperty("--secondaire", c.s);
+  ecrireStockage("cm-couleur", JSON.stringify(c));
+  document.querySelectorAll(".color-swatch").forEach(s=>s.classList.remove("selected"));
+  event.target.classList.add("selected");
+}
+
+function setTheme(theme){
+  ecrireStockage("cm-theme", theme);
+  appliquerTheme(theme);
+  document.querySelectorAll(".theme-btns button").forEach(b=>b.classList.remove("active"));
+  const btn = document.querySelector(`.theme-btns button[data-theme="${theme}"]`);
+  if(btn) btn.classList.add("active");
+}
+
+function appliquerTheme(theme){
+  let final = theme;
+  if(theme==="auto"){
+    final = window.matchMedia("(prefers-color-scheme: dark)").matches ? "sombre" : "clair";
+  }
+  document.documentElement.setAttribute("data-theme", final==="sombre"?"sombre":"clair");
+}
+
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>{
+  if(lireStockage("cm-theme")==="auto") appliquerTheme("auto");
+});
+
+const SLIDERS = [
+  {id:"slider-taille",var:"--taille",suffix:"px",valId:"valeur-taille",key:"cm-taille"},
+  {id:"slider-largeur",var:"--largeur",suffix:"px",valId:"valeur-largeur",key:"cm-largeur"},
+  {id:"slider-interligne",var:"--interligne",suffix:"",valId:"valeur-interligne",key:"cm-interligne",line:true}
+];
+
+function initSliders(){
+  SLIDERS.forEach(s=>{
+    const input = document.getElementById(s.id);
+    const saved = lireStockage(s.key);
+    if(saved){ input.value = saved; appliquerSlider(s, saved); }
+    input.oninput = ()=>{
+      appliquerSlider(s, input.value);
+      ecrireStockage(s.key, input.value);
+    };
+  });
+}
+
+function appliquerSlider(s, val){
+  if(s.line){
+    const v = (val/10).toFixed(1);
+    document.documentElement.style.setProperty(s.var, v);
+    document.getElementById(s.valId).textContent = v;
+  } else {
+    document.documentElement.style.setProperty(s.var, val+s.suffix);
+    document.getElementById(s.valId).textContent = val+s.suffix;
+  }
+}
+
+function ouvrirParametres(){
+  initCouleurs();
+  initSliders();
+  const theme = lireStockage("cm-theme")||"clair";
+  document.querySelectorAll(".theme-btns button").forEach(b=>b.classList.remove("active"));
+  const btn = document.querySelector(`.theme-btns button[data-theme="${theme}"]`);
+  if(btn) btn.classList.add("active");
+  document.getElementById("settings-modal").classList.add("active");
+}
+function fermerParametres(){ document.getElementById("settings-modal").classList.remove("active"); }
+
+function chargerParametres(){
+  // Couleur
+  const c = JSON.parse(lireStockage("cm-couleur")||"null");
+  if(c){
+    document.documentElement.style.setProperty("--primaire", c.p);
+    document.documentElement.style.setProperty("--secondaire", c.s);
+  }
+  // Thème
+  const theme = lireStockage("cm-theme")||"clair";
+  appliquerTheme(theme);
+  // Sliders
+  SLIDERS.forEach(s=>{
+    const saved = lireStockage(s.key);
+    if(saved) appliquerSlider(s, saved);
+  });
+}
+
+/* ============================================================
+   13. TOAST
+============================================================ */
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove("show"), 2500);
+}
+
+/* ============================================================
+   14. INITIALISATION
+============================================================ */
+window.addEventListener("DOMContentLoaded", ()=>{
+  if(chargerUtilisateur()){
+    lancerApplication();
+  }
+});
+
+document.getElementById("settings-modal").addEventListener("click", function(e){
+  if(e.target===this) fermerParametres();
+});
+</script>
+
+</body>
+</html>
