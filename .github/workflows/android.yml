@@ -7,16 +7,7 @@ on:
       - main
     paths:
       - 'index.html'
-      - 'style.css'
-      - 'app.js'
-      - 'manifest.json'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'capacitor.config.json'
       - 'images/**'
-      - 'audio/**'
-      - 'audios/**'
-      - 'sounds/**'
       - '.github/workflows/android.yml'
 
 permissions:
@@ -41,7 +32,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: gradle
 
       - name: Installer Android SDK
         uses: android-actions/setup-android@v4
@@ -50,81 +40,77 @@ jobs:
 
       - name: Vérifier les fichiers nécessaires
         run: |
-          test -f index.html || { echo 'ERREUR : index.html est introuvable à la racine du dépôt.'; exit 1; }
-          test -f images/icon.png || { echo 'ERREUR : images/icon.png est introuvable.'; exit 1; }
+          test -f index.html || { echo "ERREUR : index.html introuvable."; exit 1; }
+          test -f images/icon.png || { echo "ERREUR : images/icon.png introuvable."; exit 1; }
           if [ ! -f images/splash.png ] && [ ! -f images/splash-screen.png ]; then
-            echo 'ERREUR : place images/splash.png ou images/splash-screen.png dans le dossier images.'
+            echo "ERREUR : images/splash.png ou images/splash-screen.png est nécessaire."
             exit 1
           fi
-          echo 'Fichiers HTML et images trouvés.'
 
-      - name: Préparer le projet Node et Capacitor
+      - name: Installer Capacitor
         run: |
-          if [ ! -f package.json ]; then
-            npm init -y
-          fi
+          npm init -y
           npm install @capacitor/core @capacitor/android @capacitor/cli @capacitor/assets
-          if [ ! -f capacitor.config.json ]; then
-            cat > capacitor.config.json <<'JSON'
+
+          cat > capacitor.config.json <<'JSON'
           {
             "appId": "com.israelzongwe.contemerveilles",
             "appName": "ConteMerveilles",
-            "webDir": "www",
-            "bundledWebRuntime": false
+            "webDir": "www"
           }
           JSON
-          fi
 
-      - name: Préparer les fichiers web
+      - name: Préparer les fichiers de l'application
         run: |
           mkdir -p www
           cp index.html www/
-          for file in style.css app.js manifest.json; do
-            if [ -f "$file" ]; then cp "$file" www/; fi
-          done
-          for folder in images audio audios sounds; do
-            if [ -d "$folder" ]; then cp -R "$folder" www/; fi
-          done
+          cp -R images www/
 
-      - name: Préparer les ressources de l'icône et du démarrage
+      - name: Préparer l'icône et l'écran de démarrage
         run: |
-          python3 -m pip install --user Pillow
+          python3 -m pip install Pillow
           python3 - <<'PY'
           from pathlib import Path
           from PIL import Image, ImageOps
 
           Path("assets").mkdir(exist_ok=True)
 
-          def contain_on_canvas(source, size, background):
+          def prepare(source, size, background):
               image = Image.open(source).convert("RGBA")
-              image = ImageOps.contain(image, (size, size), method=Image.Resampling.LANCZOS)
+              image = ImageOps.contain(
+                  image, (size, size), method=Image.Resampling.LANCZOS
+              )
               canvas = Image.new("RGBA", (size, size), background)
-              x = (size - image.width) // 2
-              y = (size - image.height) // 2
-              canvas.alpha_composite(image, (x, y))
+              canvas.alpha_composite(
+                  image,
+                  ((size - image.width) // 2, (size - image.height) // 2)
+              )
               return canvas
 
-          icon = contain_on_canvas("images/icon.png", 1024, (0, 0, 0, 0))
+          icon = prepare("images/icon.png", 1024, (0, 0, 0, 0))
           icon.save("assets/icon-only.png")
           icon.save("assets/icon-foreground.png")
-          Image.new("RGB", (1024, 1024), (7, 20, 38)).save("assets/icon-background.png")
+          Image.new("RGB", (1024, 1024), (7, 20, 38)).save(
+              "assets/icon-background.png"
+          )
 
-          splash_source = "images/splash.png" if Path("images/splash.png").is_file() else "images/splash-screen.png"
-          splash = contain_on_canvas(splash_source, 2732, (7, 20, 38, 255))
-          splash.convert("RGB").save("assets/splash.png")
-          print(f"Icône préparée depuis images/icon.png ; splash préparé depuis {splash_source}.")
+          splash_source = (
+              "images/splash.png"
+              if Path("images/splash.png").is_file()
+              else "images/splash-screen.png"
+          )
+          prepare(splash_source, 2732, (7, 20, 38, 255)).convert("RGB").save(
+              "assets/splash.png"
+          )
           PY
 
-      - name: Ajouter la plateforme Android si nécessaire
-        run: |
-          if [ ! -d android ]; then
-            npx cap add android
-          fi
+      - name: Ajouter Android
+        run: npx cap add android
 
-      - name: Générer les icônes et l'écran de démarrage Android
+      - name: Générer les ressources Android
         run: npx capacitor-assets generate --android
 
-      - name: Synchroniser Capacitor
+      - name: Synchroniser le projet
         run: npx cap sync android
 
       - name: Construire l'APK
